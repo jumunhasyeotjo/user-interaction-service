@@ -22,7 +22,7 @@ public enum UserRole {
         return Arrays.stream(UserRole.values())
             .filter(a -> a.name().equalsIgnoreCase(role))
             .findFirst()
-            .orElseThrow(() -> new BusinessException(ErrorCode.ROLE_NOT_FOUND, "유효한 ROLE이 아닙니다."));
+            .orElseThrow(() -> new BusinessException(ErrorCode.ROLE_NOT_FOUND));
     }
 
     private static class Role {

@@ -45,7 +45,7 @@ class UserTest {
         // when, then
         assertThatThrownBy(() -> User.join(name, password, slackId, role, belong))
             .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("유효한 ROLE이 아닙니다.");
+            .hasMessageContaining("유효한 역할이 아닙니다.");
     }
 
     @Test

@@ -64,7 +64,7 @@ public class User extends BaseEntity {
 
     public void approve(ApproveTarget target) {
         if (!this.status.canBeApproved()) {
-            throw new BusinessException(ErrorCode.ALREADY_APPROVED, "이미 승인된 사용자입니다.");
+            throw new BusinessException(ErrorCode.ALREADY_APPROVED);
         }
 
         this.status = UserStatus.APPROVED;
@@ -74,7 +74,7 @@ public class User extends BaseEntity {
             case HUB_DRIVER, COMPANY_DRIVER -> this.driver = (Driver) target;
             case COMPANY_MANAGER -> this.companyManager = (CompanyManager) target;
             case HUB_MANAGER -> this.hubManager = (HubManager) target;
-            default -> throw new BusinessException(ErrorCode.ROLE_NOT_FOUND, "유효한 ROLE이 아닙니다.");
+            default -> throw new BusinessException(ErrorCode.ROLE_NOT_FOUND);
         }
     }
 

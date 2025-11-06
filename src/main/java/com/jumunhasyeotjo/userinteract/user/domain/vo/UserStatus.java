@@ -15,7 +15,7 @@ public enum UserStatus {
         return Arrays.stream(UserStatus.values())
             .filter(a -> a.name().equalsIgnoreCase(status))
             .findFirst()
-            .orElseThrow(() -> new BusinessException(ErrorCode.ROLE_NOT_FOUND, "유효한 ROLE이 아닙니다."));
+            .orElseThrow(() -> new BusinessException(ErrorCode.ROLE_NOT_FOUND));
     }
 
     public boolean canBeApproved() {
