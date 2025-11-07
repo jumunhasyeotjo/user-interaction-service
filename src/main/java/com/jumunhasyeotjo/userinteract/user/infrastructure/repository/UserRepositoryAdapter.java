@@ -4,6 +4,7 @@ import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.User;
 import com.jumunhasyeotjo.userinteract.user.domain.repository.UserRepository;
+import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
+import static com.jumunhasyeotjo.userinteract.user.domain.entity.QCompanyManager.companyManager;
 import static com.jumunhasyeotjo.userinteract.user.domain.entity.QDriver.driver;
+import static com.jumunhasyeotjo.userinteract.user.domain.entity.QHubManager.hubManager;
 import static com.jumunhasyeotjo.userinteract.user.domain.entity.QUser.user;
 
 @Component
@@ -55,10 +58,10 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Page<User> findAllByStatusIsPENDING(Pageable pageable) {
+    public Page<User> findAllByStatus(Pageable pageable, UserStatus status) {
         List<User> content = queryFactory
             .selectFrom(user)
-            .where(user.status.eq(UserStatus.PENDING))
+            .where(user.status.eq(status))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -66,7 +69,89 @@ public class UserRepositoryAdapter implements UserRepository {
         Long total = queryFactory
             .select(user.count())
             .from(user)
-            .where(user.status.eq(UserStatus.PENDING))
+            .where(user.status.eq(status))
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<User> findAllByRole(Pageable pageable, UserRole role) {
+        List<User> content = queryFactory
+            .selectFrom(user)
+            .where(user.role.eq(role))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        Long total = queryFactory
+            .select(user.count())
+            .from(user)
+            .where(user.role.eq(role))
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<User> findCompanyDriverByHubId(Pageable pageable, UUID hubId) {
+        List<User> content = queryFactory.selectFrom(user)
+            .join(user.driver, driver)
+            .where(driver.hubId.eq(hubId))
+            .fetch();
+
+        Long total = queryFactory
+            .select(driver.count())
+            .from(driver)
+            .where(driver.hubId.eq(hubId))
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<User> findHubDriverByHubId(Pageable pageable) {
+        List<User> content = queryFactory.selectFrom(user)
+            .join(user.driver, driver)
+            .where(driver.hubId.isNull())
+            .fetch();
+
+        Long total = queryFactory
+            .select(driver.count())
+            .from(driver)
+            .where(driver.hubId.isNull())
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<User> findHubManagerByHubId(Pageable pageable, UUID hubId) {
+        List<User> content = queryFactory.selectFrom(user)
+            .join(user.hubManager, hubManager)
+            .where(hubManager.hubId.eq(hubId))
+            .fetch();
+
+        Long total = queryFactory
+            .select(hubManager.count())
+            .from(hubManager)
+            .where(hubManager.hubId.eq(hubId))
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public Page<User> findCompanyManagerByCompanyId(Pageable pageable, UUID companyId) {
+        List<User> content = queryFactory.selectFrom(user)
+            .join(user.companyManager, companyManager)
+            .where(companyManager.companyId.eq(companyId))
+            .fetch();
+
+        Long total = queryFactory
+            .select(hubManager.count())
+            .from(hubManager)
+            .where(companyManager.companyId.eq(companyId))
             .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);

@@ -5,6 +5,7 @@ import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.config.JPAQueryFactoryTestConfig;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.Driver;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.User;
+import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.infrastructure.repository.JpaUserRepository;
 import com.jumunhasyeotjo.userinteract.user.infrastructure.repository.UserRepositoryAdapter;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -47,8 +48,8 @@ class UserRepositoryTest {
         Driver hubDriverTarget = new Driver(hubDriver);
         Driver companyDriverTarget = new Driver(companyDriver);
 
-        hubDriver.approve(hubDriverTarget);
-        companyDriver.approve(companyDriverTarget);
+        hubDriver.approve(hubDriverTarget, UserStatus.APPROVED);
+        companyDriver.approve(companyDriverTarget, UserStatus.APPROVED);
 
         jpaUserRepository.save(hubDriver);
         jpaUserRepository.save(companyDriver);

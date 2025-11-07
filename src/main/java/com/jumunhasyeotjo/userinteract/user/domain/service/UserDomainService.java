@@ -5,17 +5,21 @@ import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.*;
 import com.jumunhasyeotjo.userinteract.user.domain.repository.UserRepository;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
+import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import lombok.RequiredArgsConstructor;
 
 
-@RequiredArgsConstructor
 public class UserDomainService {
 
     private final UserRepository userRepository;
 
-    public void approveUser(User user) {
+    public UserDomainService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void approveUser(User user, UserStatus status) throws BusinessException {
         ApproveTarget target = createApprovalTarget(user);
-        user.approve(target);
+        user.approve(target, status);
 
         if (user.getRole().isDriver()) {
             assignOrderToDriver(user.getRole(), (Driver) target);

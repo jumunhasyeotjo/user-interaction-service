@@ -38,7 +38,7 @@ class UserDomainServiceTest {
             .thenReturn(10);
 
         // when
-        userDomainService.approveUser(user);
+        userDomainService.approveUser(user, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus()).isEqualTo(UserStatus.APPROVED);
@@ -57,7 +57,7 @@ class UserDomainServiceTest {
             .thenReturn(10);
 
         // when
-        userDomainService.approveUser(user);
+        userDomainService.approveUser(user, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus()).isEqualTo(UserStatus.APPROVED);
@@ -74,7 +74,7 @@ class UserDomainServiceTest {
         User user = User.join("user1", "password", "slack1", "MASTER", hubId);
 
         // when, then
-        assertThatThrownBy(() -> userDomainService.approveUser(user))
+        assertThatThrownBy(() -> userDomainService.approveUser(user, UserStatus.APPROVED))
             .isInstanceOf(BusinessException.class)
             .hasMessageContaining(ErrorCode.NOT_APPROVAL_TARGET.getMessage());
     }

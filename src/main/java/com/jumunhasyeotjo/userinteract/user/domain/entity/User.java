@@ -62,19 +62,22 @@ public class User extends BaseEntity {
         return user;
     }
 
-    public void approve(ApproveTarget target) {
+    public void approve(ApproveTarget target, UserStatus status) {
         if (!this.status.canBeApproved()) {
             throw new BusinessException(ErrorCode.NOT_APPROVAL_STATUS);
         }
 
-        this.status = UserStatus.APPROVED;
-        target.approve(this);
+        this.status = status;
+        if (status.equals(UserStatus.APPROVED)) {
+            target.approve(this);
 
-        switch (this.role) {
-            case HUB_DRIVER, COMPANY_DRIVER -> this.driver = (Driver) target;
-            case COMPANY_MANAGER -> this.companyManager = (CompanyManager) target;
-            case HUB_MANAGER -> this.hubManager = (HubManager) target;
+            switch (this.role) {
+                case HUB_DRIVER, COMPANY_DRIVER -> this.driver = (Driver) target;
+                case COMPANY_MANAGER -> this.companyManager = (CompanyManager) target;
+                case HUB_MANAGER -> this.hubManager = (HubManager) target;
+            }
         }
+
     }
 
     public void memberCancellation(Long requesterId) {

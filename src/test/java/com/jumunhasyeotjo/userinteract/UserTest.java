@@ -89,7 +89,7 @@ class UserTest {
         // when
         User user = User.join(name, password, slackId, role, belong);
         Driver driver = new Driver(user);
-        user.approve(driver);
+        user.approve(driver, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus())
@@ -121,7 +121,7 @@ class UserTest {
         // when
         User user = User.join(name, password, slackId, role, belong);
         Driver driver = new Driver(user);
-        user.approve(driver);
+        user.approve(driver, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus())
