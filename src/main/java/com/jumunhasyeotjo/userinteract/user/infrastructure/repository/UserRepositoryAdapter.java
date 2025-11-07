@@ -4,10 +4,15 @@ import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.User;
 import com.jumunhasyeotjo.userinteract.user.domain.repository.UserRepository;
+import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.jumunhasyeotjo.userinteract.user.domain.entity.QDriver.driver;
@@ -42,6 +47,29 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public boolean existsByName(String name) {
         return jpaUserRepository.existsByName(name);
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        return jpaUserRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<User> findAllByStatusIsPENDING(Pageable pageable) {
+        List<User> content = queryFactory
+            .selectFrom(user)
+            .where(user.status.eq(UserStatus.PENDING))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        Long total = queryFactory
+            .select(user.count())
+            .from(user)
+            .where(user.status.eq(UserStatus.PENDING))
+            .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override
