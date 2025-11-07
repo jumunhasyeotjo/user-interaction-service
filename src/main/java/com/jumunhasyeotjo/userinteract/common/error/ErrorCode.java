@@ -18,7 +18,9 @@ public enum ErrorCode {
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "E009", "유효한 상태가 아닙니다.."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "E010", "사용자를 찾을 수 없습니다."),
     TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "E011", "유효한 운전자 타입이 아닙니다."),
-    ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "E012", "이미 승인된 유저입니다.")
+    NOT_APPROVAL_STATUS(HttpStatus.BAD_REQUEST, "E012", "승인이 가능한 상태가 아닙니다."),
+    NOT_APPROVAL_TARGET(HttpStatus.BAD_REQUEST, "E012", "승인이 가능한 역할이 아닙니다."),
+
 
     ;
 

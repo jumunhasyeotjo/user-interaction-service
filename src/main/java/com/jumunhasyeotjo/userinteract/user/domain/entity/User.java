@@ -64,17 +64,16 @@ public class User extends BaseEntity {
 
     public void approve(ApproveTarget target) {
         if (!this.status.canBeApproved()) {
-            throw new BusinessException(ErrorCode.ALREADY_APPROVED);
+            throw new BusinessException(ErrorCode.NOT_APPROVAL_STATUS);
         }
 
         this.status = UserStatus.APPROVED;
-        target.approve(this); // 공통 행위
+        target.approve(this);
 
         switch (this.role) {
             case HUB_DRIVER, COMPANY_DRIVER -> this.driver = (Driver) target;
             case COMPANY_MANAGER -> this.companyManager = (CompanyManager) target;
             case HUB_MANAGER -> this.hubManager = (HubManager) target;
-            default -> throw new BusinessException(ErrorCode.ROLE_NOT_FOUND);
         }
     }
 

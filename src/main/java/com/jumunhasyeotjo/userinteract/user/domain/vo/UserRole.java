@@ -42,4 +42,8 @@ public enum UserRole {
     public boolean isDriver() {
         return this == UserRole.COMPANY_DRIVER || this == UserRole.HUB_DRIVER;
     }
+
+    public boolean isMaster() {
+        return this == UserRole.MASTER;
+    }
 }
