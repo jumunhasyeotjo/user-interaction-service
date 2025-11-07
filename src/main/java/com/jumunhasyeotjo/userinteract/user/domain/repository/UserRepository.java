@@ -1,7 +1,6 @@
 package com.jumunhasyeotjo.userinteract.user.domain.repository;
 
 import com.jumunhasyeotjo.userinteract.user.domain.entity.User;
-import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
