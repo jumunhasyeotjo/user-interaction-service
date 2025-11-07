@@ -99,7 +99,7 @@ class UserTest {
             .isEqualTo(driver);
 
         assertThat(driver.getUserId())
-            .isEqualTo(user.getId());
+            .isEqualTo(user.getUserId());
 
         assertThat(driver.getUser())
             .isEqualTo(user);
@@ -131,7 +131,7 @@ class UserTest {
             .isEqualTo(driver);
 
         assertThat(driver.getUserId())
-            .isEqualTo(user.getId());
+            .isEqualTo(user.getUserId());
 
         assertThat(driver.getUser())
             .isEqualTo(user);

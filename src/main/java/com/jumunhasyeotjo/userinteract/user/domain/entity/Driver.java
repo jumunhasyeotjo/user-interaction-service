@@ -26,14 +26,14 @@ public class Driver implements ApproveTarget{
 
     private UUID hubId;
 
-    private Integer order;
+    private Integer deliveryOrder;
 
     public Driver(User user) {
         this.user = user;
     }
 
     public void assignOrder(Integer order) {
-        this.order = order;
+        this.deliveryOrder = order;
     }
 
     @Override

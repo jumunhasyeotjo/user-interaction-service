@@ -43,7 +43,7 @@ class UserDomainServiceTest {
         // then
         assertThat(user.getStatus()).isEqualTo(UserStatus.APPROVED);
         assertThat(user.getDriver()).isNotNull();
-        assertThat(user.getDriver().getOrder()).isEqualTo(11);
+        assertThat(user.getDriver().getDeliveryOrder()).isEqualTo(11);
         assertThat(user.getDriver().getHubId()).isEqualTo(hubId);
     }
 
@@ -62,7 +62,7 @@ class UserDomainServiceTest {
         // then
         assertThat(user.getStatus()).isEqualTo(UserStatus.APPROVED);
         assertThat(user.getDriver()).isNotNull();
-        assertThat(user.getDriver().getOrder()).isEqualTo(11);
+        assertThat(user.getDriver().getDeliveryOrder()).isEqualTo(11);
         assertThat(user.getDriver().getHubId()).isNull();
     }
 
