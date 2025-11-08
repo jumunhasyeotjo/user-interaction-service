@@ -1,5 +1,6 @@
 package com.jumunhasyeotjo.userinteract.user.presentation.controller;
 
+import com.jumunhasyeotjo.userinteract.common.ApiRes;
 import com.jumunhasyeotjo.userinteract.user.application.UserService;
 import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
 import com.jumunhasyeotjo.userinteract.user.application.command.JoinCommand;
@@ -23,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/")
-    public UserDetailRes join(@RequestBody JoinReq req) {
+    public ApiRes<UserDetailRes> join(@RequestBody JoinReq req) {
         JoinCommand command = new JoinCommand(
             req.name(),
             req.password(),
@@ -32,63 +33,64 @@ public class UserController {
             req.belong()
         );
 
-        return UserDetailRes.from(userService.join(command));
+        return ApiRes.success(UserDetailRes.from(userService.join(command)));
     }
 
     @PatchMapping("/approve")
-    public UserDetailRes approveUser(@RequestBody ApproveReq req) {
+    public ApiRes<UserDetailRes> approveUser(@RequestBody ApproveReq req) {
         ApproveCommand command = new ApproveCommand(
             req.userId(),
             req.status()
         );
-        return UserDetailRes.from(userService.approve(command));
+        return ApiRes.success(UserDetailRes.from(userService.approve(command)));
     }
 
     @GetMapping("/{userId}")
-    public UserDetailRes getUser(@PathVariable Long userId) {
-        return UserDetailRes.from(userService.getUser(userId));
+    public ApiRes<UserDetailRes> getUser(@PathVariable Long userId) {
+        return ApiRes.success(UserDetailRes.from(userService.getUser(userId)));
     }
 
     @GetMapping("/")
-    public Page<UserDetailRes> getUsers(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
-        return userService.getUsers(pageable).map(UserDetailRes::from);
+    public ApiRes<Page<UserDetailRes>> getUsers(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
+        return ApiRes.success(userService.getUsers(pageable).map(UserDetailRes::from));
     }
 
     @GetMapping("/status/{req}")
-    public Page<UserDetailRes> getUsersByStatus(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable String req) {
+    public ApiRes<Page<UserDetailRes>> getUsersByStatus(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable String req) {
         UserStatus status = UserStatus.of(req);
-        return userService.getUsersByStatus(pageable, status).map(UserDetailRes::from);
+        return ApiRes.success(userService.getUsersByStatus(pageable, status).map(UserDetailRes::from));
     }
 
     @GetMapping("/role/{req}")
-    public Page<UserDetailRes> getUsersByRole(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @RequestParam String req) {
+    public ApiRes<Page<UserDetailRes>> getUsersByRole(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @RequestParam String req) {
         UserRole role = UserRole.of(req);
-        return userService.getUsersByRole(pageable, role).map(UserDetailRes::from);
+        return ApiRes.success(userService.getUsersByRole(pageable, role).map(UserDetailRes::from));
     }
 
     @GetMapping("/companyDriver/{hubId}")
-    public Page<CompanyDriverDetailRes> getCompanyDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
-        return userService.getCompanyDriverByHubId(pageable, hubId).map(CompanyDriverDetailRes::from);
+    public ApiRes<Page<CompanyDriverDetailRes>> getCompanyDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
+        return ApiRes.success(userService.getCompanyDriverByHubId(pageable, hubId).map(CompanyDriverDetailRes::from));
     }
 
     @GetMapping("/hubDriver")
-    public Page<HubDriverDetailRes> getHubDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
-        return userService.getHubDriverByHubId(pageable).map(HubDriverDetailRes::from);
+    public ApiRes<Page<HubDriverDetailRes>> getHubDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
+        return ApiRes.success(userService.getHubDriverByHubId(pageable).map(HubDriverDetailRes::from));
     }
 
     @GetMapping("/hubManager/{hubId}")
-    public Page<HubManagerDetailRes> getHubManagerByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
-        return userService.getHubManagerByHubId(pageable, hubId).map(HubManagerDetailRes::from);
+    public ApiRes<Page<HubManagerDetailRes>> getHubManagerByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
+        return ApiRes.success(userService.getHubManagerByHubId(pageable, hubId).map(HubManagerDetailRes::from));
     }
 
     @GetMapping("/companyManager/{companyId}")
-    public Page<CompanyManagerDetailRes> getCompanyManagerByCompanyId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID companyId) {
-        return userService.getCompanyManagerByCompanyId(pageable, companyId).map(CompanyManagerDetailRes::from);
+    public ApiRes<Page<CompanyManagerDetailRes>> getCompanyManagerByCompanyId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID companyId) {
+        return ApiRes.success(userService.getCompanyManagerByCompanyId(pageable, companyId).map(CompanyManagerDetailRes::from));
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
+    public ApiRes<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
+        return ApiRes.success(null);
     }
 
 
