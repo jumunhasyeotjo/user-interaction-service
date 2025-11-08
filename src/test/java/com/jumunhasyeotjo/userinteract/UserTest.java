@@ -89,7 +89,7 @@ class UserTest {
         // when
         User user = User.join(name, password, slackId, role, belong);
         Driver driver = new Driver(user);
-        user.approve(driver);
+        user.approve(driver, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus())
@@ -99,7 +99,7 @@ class UserTest {
             .isEqualTo(driver);
 
         assertThat(driver.getUserId())
-            .isEqualTo(user.getId());
+            .isEqualTo(user.getUserId());
 
         assertThat(driver.getUser())
             .isEqualTo(user);
@@ -121,7 +121,7 @@ class UserTest {
         // when
         User user = User.join(name, password, slackId, role, belong);
         Driver driver = new Driver(user);
-        user.approve(driver);
+        user.approve(driver, UserStatus.APPROVED);
 
         // then
         assertThat(user.getStatus())
@@ -131,7 +131,7 @@ class UserTest {
             .isEqualTo(driver);
 
         assertThat(driver.getUserId())
-            .isEqualTo(user.getId());
+            .isEqualTo(user.getUserId());
 
         assertThat(driver.getUser())
             .isEqualTo(user);
