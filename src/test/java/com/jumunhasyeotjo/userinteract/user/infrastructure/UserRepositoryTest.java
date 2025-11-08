@@ -1,4 +1,4 @@
-package com.jumunhasyeotjo.userinteract;
+package com.jumunhasyeotjo.userinteract.user.infrastructure;
 
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
