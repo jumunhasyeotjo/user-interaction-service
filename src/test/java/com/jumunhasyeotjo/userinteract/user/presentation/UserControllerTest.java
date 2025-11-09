@@ -73,7 +73,7 @@ class UserControllerTest {
         mockMvc.perform(post("/v1/users/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(jsonPath("$.data.name").value("홍길동"))
             .andExpect(jsonPath("$.data.role").value("HUB_DRIVER"));
     }
