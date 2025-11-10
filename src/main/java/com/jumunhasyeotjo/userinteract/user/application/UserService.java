@@ -37,9 +37,8 @@ public class UserService {
             joinCommand.role(),
             joinCommand.belong()
         );
-
-        userRepository.save(user);
-         return UserResult.from(user);
+      
+         return UserResult.from(userRepository.save(user));
     }
 
     @Transactional
