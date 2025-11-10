@@ -70,7 +70,7 @@ class UserControllerTest {
         BDDMockito.given(userService.join(any())).willReturn(mockResult);
 
         // when, then
-        mockMvc.perform(post("/v1/users/")
+        mockMvc.perform(post("/v1/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
             .andExpect(status().isCreated())
