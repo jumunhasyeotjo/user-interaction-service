@@ -25,7 +25,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<ApiRes<UserDetailRes>> join(@RequestBody JoinReq req) {
         JoinCommand command = new JoinCommand(
             req.name(),

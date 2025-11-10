@@ -38,6 +38,7 @@ public class UserService {
             joinCommand.belong()
         );
 
+        userRepository.save(user);
          return UserResult.from(user);
     }
 
