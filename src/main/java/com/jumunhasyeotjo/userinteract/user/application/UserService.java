@@ -37,7 +37,7 @@ public class UserService {
             joinCommand.role(),
             joinCommand.belong()
         );
-
+      
          return UserResult.from(userRepository.save(user));
     }
 
@@ -53,6 +53,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResult getUser(Long userId) {
         User user = userRepository.findById(userId);
+        return UserResult.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResult getUserByName(String name) {
+        User user = userRepository.findByName(name);
         return UserResult.from(user);
     }
 
