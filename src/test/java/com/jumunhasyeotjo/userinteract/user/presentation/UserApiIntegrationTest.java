@@ -41,7 +41,7 @@ class UserApiIntegrationTest {
 
     @Test
     @DisplayName("회원가입 후 단건 조회까지 E2E 플로우")
-    void joinAndGetUserByName_EndToEndFlow() {
+    void joinAndGetUserByNameWillSuccess() {
         // given
         JoinReq joinReq = new JoinReq(
             "홍길동",

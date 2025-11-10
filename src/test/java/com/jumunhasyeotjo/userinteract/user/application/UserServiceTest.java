@@ -64,7 +64,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    void join_Success() {
+    void joinWillSuccess() {
         JoinCommand command = new JoinCommand("Alice", "password", "slackId", "HUB_DRIVER", UUID.randomUUID());
         when(userRepository.existsByName("Alice")).thenReturn(false);
 
@@ -75,7 +75,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 중복 이름 예외")
-    void join_DuplicateName_ThrowsException() {
+    void join_DuplicateNameWillThrowsException() {
         JoinCommand command = new JoinCommand("Alice", "password", "slackId", "HUB_DRIVER", UUID.randomUUID());
         when(userRepository.existsByName("Alice")).thenReturn(true);
 
@@ -84,7 +84,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 승인 성공")
-    void approve_Success() {
+    void approveWillSuccess() {
         Long userId = 1L;
         ApproveCommand command = new ApproveCommand(userId, "APPROVED");
         setUser(UserRole.HUB_DRIVER);
@@ -98,7 +98,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("단일 회원 조회 성공")
-    void getUser_Success() {
+    void getUserWillSuccess() {
         Long userId = 1L;
         setUser(UserRole.HUB_DRIVER);
         when(userRepository.findById(userId)).thenReturn(user);
@@ -110,7 +110,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("모든 회원 페이지 조회 성공")
-    void getUsers_Success() {
+    void getUsersWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         setUser(UserRole.HUB_DRIVER);
         Page<User> page = new PageImpl<>(List.of(user));
@@ -123,7 +123,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 상태별 페이지 조회 성공")
-    void getUsersByStatus_Success() {
+    void getUsersByStatusWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UserStatus status = UserStatus.APPROVED;
         setUser(UserRole.HUB_DRIVER);
@@ -137,7 +137,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 역할별 페이지 조회 성공")
-    void getUsersByRole_Success() {
+    void getUsersByRoleWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UserRole role = UserRole.HUB_DRIVER;
         setUser(UserRole.HUB_DRIVER);
@@ -151,7 +151,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회사 운전자 허브 ID별 페이지 조회 성공")
-    void getCompanyDriverByHubId_Success() {
+    void getCompanyDriverByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID hubId = UUID.randomUUID();
         setUser(UserRole.COMPANY_DRIVER);
@@ -167,7 +167,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("허브 운전자 페이지 조회 성공")
-    void getHubDriverByHubId_Success() {
+    void getHubDriverByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         setUser(UserRole.HUB_DRIVER);
         Driver target = new Driver(user);
@@ -182,7 +182,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("허브 관리자 허브 ID별 페이지 조회 성공")
-    void getHubManagerByHubId_Success() {
+    void getHubManagerByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID hubId = UUID.randomUUID();
         setUser(UserRole.HUB_MANAGER);
@@ -198,7 +198,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회사 관리자 회사 ID별 페이지 조회 성공")
-    void getCompanyManagerByCompanyId_Success() {
+    void getCompanyManagerByCompanyIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID companyId = UUID.randomUUID();
         setUser(UserRole.COMPANY_MANAGER);
@@ -214,7 +214,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 삭제 성공")
-    void deleteUser_Success() {
+    void deleteUserWillSuccess() {
         Long userId = 1L;
         User user = mock(User.class);
         when(userRepository.findById(userId)).thenReturn(user);

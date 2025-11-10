@@ -48,7 +48,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("POST /v1/users/ - 회원가입 성공")
-    void joinUserSuccess() throws Exception {
+    void joinUserWillSuccess() throws Exception {
         // given
         JoinReq req = new JoinReq(
             "홍길동",
@@ -80,7 +80,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("PATCH /v1/users/approve 사용자 승인")
-    void approveUserSuccess() throws Exception {
+    void approveUserWillSuccess() throws Exception {
         // given
         ApproveReq req = new ApproveReq(
             1L,
@@ -112,7 +112,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("GET /v1/users/{userId} - 단일 사용자 조회 성공")
-    void getUserSuccess() throws Exception {
+    void getUserWillSuccess() throws Exception {
         // given
         UserResult mockResult = new UserResult(
             1L,
@@ -134,7 +134,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("DELETE /v1/users/{userId} - 사용자 삭제 성공")
-    void deleteUserSuccess() throws Exception {
+    void deleteUserWillSuccess() throws Exception {
         // given
         BDDMockito.willDoNothing().given(userService).deleteUser(1L);
 

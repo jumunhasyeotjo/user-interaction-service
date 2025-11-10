@@ -16,7 +16,7 @@ class UserTest {
 
     @Test
     @DisplayName("유저 생성 시 상태가 승인 대기 중이어야 한다.")
-    void joinUserStatusWillBePending() {
+    void joinUserStatusWillPending() {
         // given
         String name = "user1";
         String password = "password1";

@@ -72,14 +72,14 @@ class UserRepositoryTest {
 
     @Test
     @DisplayName("HUB DRIVER의 경우 hub_id를 통해 Order의 max 값을 가져온다. 현재의 테스트에서는 0이 나오는 게 맞다.")
-    void findMaxDriverOrderByHubIdWithSuccessCase() {
+    void findMaxDriverOrderByHubIdWillSuccess() {
         Integer result = userRepositoryAdapter.findMaxDriverOrderByHubId(companyDriver.getDriver().getHubId());
         assertThat(result).isEqualTo(0);
     }
 
     @Test
     @DisplayName("COMPANY DRIVER의 경우 hub_id가 null Order의 max 값을 가져온다.")
-    void findMaxHubDriverOrderWithSuccessCase() {
+    void findMaxHubDriverOrderWillSuccess() {
         Integer result = userRepositoryAdapter.findMaxHubDriverOrder();
         assertThat(result).isEqualTo(0);
     }
