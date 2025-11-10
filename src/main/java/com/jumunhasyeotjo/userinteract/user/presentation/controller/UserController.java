@@ -60,6 +60,13 @@ public class UserController {
         );
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(@PathVariable String name) {
+        return ResponseEntity.ok(
+            ApiRes.success(UserDetailRes.from(userService.getUserByName(name)))
+        );
+    }
+
     @GetMapping("/")
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
         return ResponseEntity.ok(

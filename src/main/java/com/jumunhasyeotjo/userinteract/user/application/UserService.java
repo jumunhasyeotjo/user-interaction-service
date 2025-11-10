@@ -57,6 +57,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public UserResult getUserByName(String name) {
+        User user = userRepository.findByName(name);
+        return UserResult.from(user);
+    }
+
+    @Transactional(readOnly = true)
     public Page<UserResult> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(UserResult::from);
     }
