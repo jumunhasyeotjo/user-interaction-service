@@ -52,7 +52,7 @@ class UserApiIntegrationTest {
         );
 
         // when: 회원가입 요청
-        String name =
+        Integer intUserId =
             given()
                 .contentType(ContentType.JSON)
                 .body(joinReq)
@@ -61,19 +61,21 @@ class UserApiIntegrationTest {
                 .then()
                 .statusCode(201)
                 .extract()
-                .path("data.name");
+                .path("data.userId");
+
+        Long userId = intUserId.longValue(); // RestAssured가 타입 캐스팅을 못하는듯 함.
 
         // then: 회원 조회 요청
         given()
             .when()
-            .get("/v1/users/name/{name}", name)
+            .get("/v1/users/{userId}", userId)
             .then()
             .statusCode(200)
             .body("data.name", equalTo("홍길동"))
             .body("data.status", equalTo(UserStatus.PENDING.name()));
 
         // DB 검증
-        var savedUser = userRepository.findByName(name).orElseThrow();
+        var savedUser = userRepository.findById(userId).orElseThrow();
         assertThat(savedUser.getName()).isEqualTo("홍길동");
         assertThat(savedUser.getRole()).isEqualTo(UserRole.MASTER);
         assertThat(savedUser.getStatus()).isEqualTo(UserStatus.PENDING);
