@@ -1,4 +1,4 @@
-package com.jumunhasyeotjo.userinteract;
+package com.jumunhasyeotjo.userinteract.user.domain;
 
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.user.domain.entity.Driver;
@@ -16,7 +16,7 @@ class UserTest {
 
     @Test
     @DisplayName("유저 생성 시 상태가 승인 대기 중이어야 한다.")
-    void joinUserStatusWillBePending() {
+    void joinUserStatusWillPending() {
         // given
         String name = "user1";
         String password = "password1";
