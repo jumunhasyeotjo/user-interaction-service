@@ -3,17 +3,14 @@ package com.jumunhasyeotjo.userinteract.user.presentation.controller;
 import com.jumunhasyeotjo.userinteract.common.ApiRes;
 import com.jumunhasyeotjo.userinteract.user.application.UserService;
 import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
-import com.jumunhasyeotjo.userinteract.user.application.command.JoinCommand;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.ApproveReq;
-import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.JoinReq;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.res.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,23 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
-    @PostMapping()
-    public ResponseEntity<ApiRes<UserDetailRes>> join(@RequestBody JoinReq req) {
-        JoinCommand command = new JoinCommand(
-            req.name(),
-            req.password(),
-            req.slackId(),
-            req.role(),
-            req.belong()
-        );
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(
-                ApiRes.success(UserDetailRes.from(userService.join(command)))
-            );
-    }
 
     @PatchMapping("/approve")
     public ResponseEntity<ApiRes<UserDetailRes>> approveUser(@RequestBody ApproveReq req) {
@@ -119,10 +99,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiRes<Void>> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok(
-            ApiRes.success(null)
+            ApiRes.success(UserDetailRes.from(userService.deleteUser(userId)))
         );
     }
 
