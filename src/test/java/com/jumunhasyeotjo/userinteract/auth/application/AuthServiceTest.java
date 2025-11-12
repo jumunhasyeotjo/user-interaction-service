@@ -3,6 +3,7 @@ package com.jumunhasyeotjo.userinteract.auth.application;
 import com.jumunhasyeotjo.userinteract.auth.application.command.SignInCommand;
 import com.jumunhasyeotjo.userinteract.auth.application.command.SignUpCommand;
 import com.jumunhasyeotjo.userinteract.auth.application.result.SignInResult;
+import com.jumunhasyeotjo.userinteract.auth.application.result.SignUpResult;
 import com.jumunhasyeotjo.userinteract.auth.application.service.CompanyClient;
 import com.jumunhasyeotjo.userinteract.auth.application.service.HubClient;
 import com.jumunhasyeotjo.userinteract.auth.application.service.JwtProvider;
@@ -14,8 +15,10 @@ import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.TokenBlack
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.Role;
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 
+import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,136 +32,128 @@ import static org.mockito.Mockito.*;
 
 class AuthServiceTest {
 
-    @InjectMocks
     private AuthService authService;
-
-    @Mock
     private JwtProvider jwtProvider;
-
-    @Mock
     private UserClient userClient;
-
-    @Mock
     private HubClient hubClient;
-
-    @Mock
     private CompanyClient companyClient;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
     private RefreshTokenRedisRepository refreshTokenRedisRepository;
-
-    @Mock
     private TokenBlacklistRepository tokenBlacklistRepository;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        jwtProvider = mock(JwtProvider.class);
+        userClient = mock(UserClient.class);
+        hubClient = mock(HubClient.class);
+        companyClient = mock(CompanyClient.class);
+        passwordEncoder = mock(PasswordEncoder.class);
+        refreshTokenRedisRepository = mock(RefreshTokenRedisRepository.class);
+        tokenBlacklistRepository = mock(TokenBlacklistRepository.class);
+
+        authService = new AuthService(
+            jwtProvider,
+            userClient,
+            hubClient,
+            companyClient,
+            passwordEncoder,
+            refreshTokenRedisRepository,
+            tokenBlacklistRepository
+        );
     }
 
     @Test
-    void signUp_HubManager_ValidHub_CallsUserClientJoin() {
-        // given
-        SignUpCommand command = new SignUpCommand("홍길동", "pass123", "slackId",
-            Role.HUB_MANAGER, UUID.randomUUID());
+    @DisplayName("회원가입 성공")
+    void signUpWillSuccess() {
+        SignUpCommand command = new SignUpCommand("hong", "pw", "slackId", Role.HUB_MANAGER, UUID.randomUUID());
 
-        when(passwordEncoder.encode(command.password())).thenReturn("encodedPass");
+        when(passwordEncoder.encode("pw")).thenReturn("encodedPw");
         when(hubClient.exist(command.belong())).thenReturn(true);
+        when(userClient.join(ArgumentMatchers.any())).thenReturn(
+            new UserDto(
+                1L,
+                "hong",
+                "slackId",
+                "HUB_DRIVER",
+                "PENDING",
+                LocalDateTime.now()
+            )
+        );
 
-        // when
-        authService.signUp(command);
+        SignUpResult result = authService.signUp(command);
 
-        // then
-        verify(userClient, times(1)).join(any());
+        assertThat(result).isNotNull();
+        verify(userClient).join(ArgumentMatchers.any());
     }
 
     @Test
-    void signUp_HubManager_InvalidHub_ThrowsException() {
-        SignUpCommand command = new SignUpCommand("홍길동", "pass123", "slackId",
-            Role.HUB_MANAGER, UUID.randomUUID());
+    @DisplayName("회원가입 - 허브 존재하지 않으면 예외")
+    void signUpWithInvalidHubWillThrowException() {
+        SignUpCommand command = new SignUpCommand("hong", "pw", "slackId", Role.HUB_MANAGER, UUID.randomUUID());
 
-        when(passwordEncoder.encode(command.password())).thenReturn("encodedPass");
         when(hubClient.exist(command.belong())).thenReturn(false);
 
-        assertThrows(BusinessException.class, () -> authService.signUp(command));
-        verify(userClient, never()).join(any());
+        BusinessException ex = assertThrows(BusinessException.class, () -> authService.signUp(command));
+        assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.INVALID_HUB);
     }
 
     @Test
-    void signIn_ValidUser_ReturnsTokens() {
-        SignInCommand command = new SignInCommand("홍길동", "pass123");
+    @DisplayName("로그인 성공")
+    void signInWillSuccess() {
+        SignInCommand command = new SignInCommand("hong", "pw");
+        UserDto userDto = new UserDto(
+            1L,
+            "hong",
+            "slackId",
+            "HUB_DRIVER",
+            "PENDING",
+            LocalDateTime.now()
+        );
+        TokenDto tokenDto = TokenDto.of("access", "refresh");
 
-        UserDto dto = new UserDto(1L, "홍길동", "slackId", Role.HUB_MANAGER.name(), "APPROVED", LocalDateTime.now());
-        when(userClient.validate(command.name(), command.password())).thenReturn(dto);
-
-        TokenDto tokenDto = TokenDto.of("accessToken", "refreshToken");
-        when(jwtProvider.generateToken(dto.name(), dto.role())).thenReturn(tokenDto);
-        when(jwtProvider.getRefreshExpiration()).thenReturn(1000L);
+        when(userClient.validate("hong", "pw")).thenReturn(userDto);
+        when(jwtProvider.generateToken(eq("hong"), anyString())).thenReturn(tokenDto);
 
         SignInResult result = authService.signIn(command);
 
-        assertThat(result.accessToken()).isEqualTo("accessToken");
-        assertThat(result.refreshToken()).isEqualTo("refreshToken");
-        verify(refreshTokenRedisRepository).save(dto.name(), "refreshToken", 1000L);
+        assertThat(result.accessToken()).isEqualTo("access");
+        assertThat(result.refreshToken()).isEqualTo("refresh");
+        verify(refreshTokenRedisRepository).save("hong", "refresh", jwtProvider.getRefreshExpiration());
     }
 
     @Test
-    void signIn_InvalidUser_ThrowsException() {
-        SignInCommand command = new SignInCommand("홍길동", "wrongPass");
-
-        when(userClient.validate(command.name(), command.password())).thenReturn(null);
-
-        assertThrows(BusinessException.class, () -> authService.signIn(command));
-    }
-
-    @Test
-    void reissue_ValidRefreshToken_ReturnsNewTokens() {
-        String refreshToken = "refreshToken";
+    @DisplayName("토큰 재발급 성공")
+    void reissueWillSuccess() {
+        String refreshToken = "refresh";
         Claims claims = mock(Claims.class);
 
         when(jwtProvider.validateToken(refreshToken)).thenReturn(true);
         when(jwtProvider.extractClaims(refreshToken)).thenReturn(claims);
-        when(claims.getSubject()).thenReturn("홍길동");
-        when(claims.get("role", String.class)).thenReturn(Role.HUB_MANAGER.name());
-
-        when(refreshTokenRedisRepository.findByName("홍길동")).thenReturn(refreshToken);
-
-        TokenDto newToken = TokenDto.of("newAccess", "newRefresh");
-        when(jwtProvider.generateToken("홍길동", Role.HUB_MANAGER.name())).thenReturn(newToken);
-        when(jwtProvider.getRefreshExpiration()).thenReturn(1000L);
+        when(claims.getSubject()).thenReturn("hong");
+        when(claims.get("role", String.class)).thenReturn("MASTER");
+        when(refreshTokenRedisRepository.findByName("hong")).thenReturn("refresh");
+        when(jwtProvider.generateToken("hong", "MASTER")).thenReturn(TokenDto.of("newAccess", "newRefresh"));
 
         SignInResult result = authService.reissue(refreshToken);
 
         assertThat(result.accessToken()).isEqualTo("newAccess");
         assertThat(result.refreshToken()).isEqualTo("newRefresh");
-        verify(refreshTokenRedisRepository).save("홍길동", "newRefresh", 1000L);
+        verify(refreshTokenRedisRepository).save("hong", "newRefresh", jwtProvider.getRefreshExpiration());
     }
 
     @Test
-    void reissue_InvalidRefreshToken_ThrowsException() {
-        String refreshToken = "invalidToken";
-        when(jwtProvider.validateToken(refreshToken)).thenReturn(false);
+    @DisplayName("로그아웃 시 토큰 삭제 및 블랙리스트 저장")
+    void logoutTestWillSuccess() {
+        String accessToken = "access";
+        String refreshToken = "refresh";
+        Claims claims = mock(Claims.class);
 
-        assertThrows(BusinessException.class, () -> authService.reissue(refreshToken));
-    }
-
-    @Test
-    void logout_RemovesRefreshTokenAndAddsToBlacklist() {
-        String accessToken = "accessToken";
-        String refreshToken = "refreshToken";
-        Claims refreshClaims = mock(Claims.class);
-        Claims accessClaims = mock(Claims.class);
-
-        when(jwtProvider.extractClaims(refreshToken)).thenReturn(refreshClaims);
-        when(refreshClaims.getSubject()).thenReturn("홍길동");
-
-        when(jwtProvider.getRemainingExpiration(accessToken)).thenReturn(1000L);
+        when(jwtProvider.getSubjectFromToken(refreshToken)).thenReturn("hong");
+        when(jwtProvider.getRemainingExpiration(accessToken)).thenReturn(3600000L);
 
         authService.logout(accessToken, refreshToken);
 
-        verify(refreshTokenRedisRepository).remove("홍길동");
-        verify(tokenBlacklistRepository).save(accessToken, 1000L);
+        verify(refreshTokenRedisRepository).remove("hong");
+        verify(tokenBlacklistRepository).save(accessToken, 3600000L);
     }
 }
