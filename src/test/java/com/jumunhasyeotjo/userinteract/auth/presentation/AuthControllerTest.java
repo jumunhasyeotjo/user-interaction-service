@@ -46,7 +46,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("회원가입 요청 성공")
-    void signUpTest() throws Exception {
+    void signUpWillSuccess() throws Exception {
         SignUpReq req = new SignUpReq("hong", "password", "slack_hong", Role.HUB_DRIVER, UUID.randomUUID());
         SignUpResult mockResult = new SignUpResult(
             1L,
@@ -66,7 +66,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("로그인 요청 성공")
-    void signInTest() throws Exception {
+    void signInWillSuccess() throws Exception {
         SignInReq req = new SignInReq("hong", "password");
         SignInResult mockResult = new SignInResult("access-token", "refresh-token");
 
@@ -82,7 +82,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("토큰 재발급 요청 성공")
-    void reissueTest() throws Exception {
+    void reissueWillSuccess() throws Exception {
         String refreshToken = "refresh-token";
         SignInResult mockResult = new SignInResult("new-access", "new-refresh");
 
@@ -97,7 +97,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("로그아웃 요청 성공")
-    void logoutTest() throws Exception {
+    void logoutSuccess() throws Exception {
         String accessToken = "access-token";
         String refreshToken = "refresh-token";
 
