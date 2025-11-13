@@ -1,5 +1,6 @@
 package com.jumunhasyeotjo.userinteract.auth.infrastructure.repository;
 
+import com.jumunhasyeotjo.userinteract.auth.application.service.BlacklistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
-public class TokenBlacklistRepository {
+public class BlacklistRedisRepository implements BlacklistRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
 

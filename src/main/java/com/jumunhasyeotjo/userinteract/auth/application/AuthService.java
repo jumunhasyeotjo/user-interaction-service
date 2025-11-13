@@ -4,15 +4,10 @@ import com.jumunhasyeotjo.userinteract.auth.application.command.SignInCommand;
 import com.jumunhasyeotjo.userinteract.auth.application.command.SignUpCommand;
 import com.jumunhasyeotjo.userinteract.auth.application.result.SignInResult;
 import com.jumunhasyeotjo.userinteract.auth.application.result.SignUpResult;
-import com.jumunhasyeotjo.userinteract.auth.application.service.CompanyClient;
-import com.jumunhasyeotjo.userinteract.auth.application.service.HubClient;
-import com.jumunhasyeotjo.userinteract.auth.application.service.JwtProvider;
-import com.jumunhasyeotjo.userinteract.auth.application.service.UserClient;
+import com.jumunhasyeotjo.userinteract.auth.application.service.*;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.JoinReq;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.TokenDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDto;
-import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.RefreshTokenRedisRepository;
-import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.TokenBlacklistRepository;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.Role;
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
@@ -33,8 +28,8 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final BlacklistRepository blacklistRepository;
 
 
     public SignUpResult signUp(SignUpCommand command) {
@@ -71,7 +66,7 @@ public class AuthService {
 
         TokenDto token = jwtProvider.generateToken(dto.name(), dto.role());
 
-        refreshTokenRedisRepository.save(dto.name(), token.refreshToken(), jwtProvider.getRefreshExpiration());
+        refreshTokenRepository.save(dto.name(), token.refreshToken(), jwtProvider.getRefreshExpiration());
 
         return new SignInResult(token.accessToken(), token.refreshToken());
     }
@@ -84,25 +79,25 @@ public class AuthService {
         Claims claims = jwtProvider.extractClaims(refreshToken);
         String name = claims.getSubject();
 
-        String savedToken = (String) refreshTokenRedisRepository.findByName(name);
+        String savedToken = (String) refreshTokenRepository.findByName(name);
         if (!refreshToken.equals(savedToken)) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
         TokenDto newToken = jwtProvider.generateToken(name, claims.get("role", String.class));
 
-        refreshTokenRedisRepository.save(name, newToken.refreshToken(), jwtProvider.getRefreshExpiration());
+        refreshTokenRepository.save(name, newToken.refreshToken(), jwtProvider.getRefreshExpiration());
 
         return new SignInResult(newToken.accessToken(), newToken.refreshToken());
     }
 
     public void logout(String accessToken, String refreshToken) {
         String name = jwtProvider.getSubjectFromToken(refreshToken);
-        refreshTokenRedisRepository.remove(name);
+        refreshTokenRepository.remove(name);
 
         long expirationMillis = jwtProvider.getRemainingExpiration(accessToken);
         if (expirationMillis > 0) {
-            tokenBlacklistRepository.save(accessToken, expirationMillis);
+            blacklistRepository.save(accessToken, expirationMillis);
         }
     }
 }

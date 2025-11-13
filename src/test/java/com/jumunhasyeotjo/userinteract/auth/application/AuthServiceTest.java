@@ -11,7 +11,7 @@ import com.jumunhasyeotjo.userinteract.auth.application.service.UserClient;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.TokenDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.RefreshTokenRedisRepository;
-import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.TokenBlacklistRepository;
+import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.BlacklistRedisRepository;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.Role;
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 
@@ -39,7 +39,7 @@ class AuthServiceTest {
     private CompanyClient companyClient;
     private PasswordEncoder passwordEncoder;
     private RefreshTokenRedisRepository refreshTokenRedisRepository;
-    private TokenBlacklistRepository tokenBlacklistRepository;
+    private BlacklistRedisRepository blacklistRedisRepository;
 
     @BeforeEach
     void setUp() {
@@ -49,7 +49,7 @@ class AuthServiceTest {
         companyClient = mock(CompanyClient.class);
         passwordEncoder = mock(PasswordEncoder.class);
         refreshTokenRedisRepository = mock(RefreshTokenRedisRepository.class);
-        tokenBlacklistRepository = mock(TokenBlacklistRepository.class);
+        blacklistRedisRepository = mock(BlacklistRedisRepository.class);
 
         authService = new AuthService(
             jwtProvider,
@@ -58,7 +58,7 @@ class AuthServiceTest {
             companyClient,
             passwordEncoder,
             refreshTokenRedisRepository,
-            tokenBlacklistRepository
+            blacklistRedisRepository
         );
     }
 
@@ -154,6 +154,6 @@ class AuthServiceTest {
         authService.logout(accessToken, refreshToken);
 
         verify(refreshTokenRedisRepository).remove("hong");
-        verify(tokenBlacklistRepository).save(accessToken, 3600000L);
+        verify(blacklistRedisRepository).save(accessToken, 3600000L);
     }
 }
