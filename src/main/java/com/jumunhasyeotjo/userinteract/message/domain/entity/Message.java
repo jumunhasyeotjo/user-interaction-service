@@ -1,6 +1,5 @@
 package com.jumunhasyeotjo.userinteract.message.domain.entity;
 
-import com.jumunhasyeotjo.userinteract.message.domain.event.MessageCreatedEvent;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.Content;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.UserId;
 import jakarta.persistence.*;
@@ -9,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
