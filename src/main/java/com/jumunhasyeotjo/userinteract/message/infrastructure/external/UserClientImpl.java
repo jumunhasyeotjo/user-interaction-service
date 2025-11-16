@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class UserClientImpl implements UserClient {
     @Override
     public String getSlackId(Long userId) {
-        return "slackId";
-    }
+        return "U09SU4KPL66";
+    } // 테스트용
 }
