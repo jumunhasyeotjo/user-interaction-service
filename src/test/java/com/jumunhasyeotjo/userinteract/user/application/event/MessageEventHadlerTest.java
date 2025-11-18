@@ -7,6 +7,7 @@ import com.jumunhasyeotjo.userinteract.message.domain.event.MessageCreatedEvent;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.Content;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.UserId;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -31,6 +32,7 @@ class MessageEventHandlerTest {
     }
 
     @Test
+    @DisplayName("비동기 이벤트 작동 확인 테스트")
     void handleMessageCreated_shouldCallSlackClient() throws InterruptedException {
         // given
         MessageCreatedEvent event = new MessageCreatedEvent(
@@ -52,6 +54,7 @@ class MessageEventHandlerTest {
     }
 
     @Test
+    @DisplayName("이벤트 실패 시 메시지 전송이 되지 않음")
     void handleMessageCreated_shouldRetryAndRecover() {
         MessageCreatedEvent event = new MessageCreatedEvent(
             Message.create(UserId.of(1L), Content.of("hi")),
