@@ -27,6 +27,9 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "A004", "토큰이 유효하지 않습니다."),
     INVALID_USER(HttpStatus.BAD_REQUEST, "M001", "사용자 번호가 유효하지 않습니다."),
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "M002", "메세지의 컨텐츠가 유효하지 않습니다."),
+    GET_CHANNEL_FAILED(HttpStatus.BAD_REQUEST, "M003", "채널을 생성/조회하는 것을 실패했습니다."),
+    SEND_MESSAGE_FAILED(HttpStatus.BAD_REQUEST, "M004", "메세지 송신에 실패하였습니다."),
+
 
 
     ;
