@@ -19,9 +19,12 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "E010", "사용자를 찾을 수 없습니다."),
     TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "E011", "유효한 운전자 타입이 아닙니다."),
     NOT_APPROVAL_STATUS(HttpStatus.BAD_REQUEST, "E012", "승인이 가능한 상태가 아닙니다."),
-    NOT_APPROVAL_TARGET(HttpStatus.BAD_REQUEST, "E013", "승인이 가능한 역할이 아닙니다."),
+    NOT_APPROVAL_TARGET(HttpStatus.BAD_REQUEST, "E012", "승인이 가능한 역할이 아닙니다."),
     DUPLICATE_USER_NAME(HttpStatus.BAD_REQUEST, "E014", "유저 이름이 중복됩니다."),
-
+    INVALID_USERINFO(HttpStatus.BAD_REQUEST, "E015", "유저 이름 또는 비밀번호가 유효하지 않습니다."),
+    INVALID_HUB(HttpStatus.BAD_REQUEST, "E016", "허브가 유효하지 않습니다."),
+    INVALID_COMPANY(HttpStatus.BAD_REQUEST, "E017", "업체가 유효하지 않습니다."),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "E018", "토큰이 유효하지 않습니다."),
 
     ;
 
