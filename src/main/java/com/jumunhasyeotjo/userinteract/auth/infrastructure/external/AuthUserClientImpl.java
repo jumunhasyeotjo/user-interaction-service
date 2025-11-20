@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class UserClientImpl implements UserClient {
+public class AuthUserClientImpl implements UserClient {
     private final UserService userService;
 
     @Override

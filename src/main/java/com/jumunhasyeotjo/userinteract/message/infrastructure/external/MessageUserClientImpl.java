@@ -4,7 +4,7 @@ import com.jumunhasyeotjo.userinteract.message.application.service.UserClient;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserClientImpl implements UserClient {
+public class MessageUserClientImpl implements UserClient {
     @Override
     public String getSlackId(Long userId) {
         return "U09SU4KPL66";
