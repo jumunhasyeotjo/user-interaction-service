@@ -1,4 +1,4 @@
-package com.jumunhasyeotjo.userinteract.user.application.event;
+package com.jumunhasyeotjo.userinteract.message.applcation.event;
 
 import com.jumunhasyeotjo.userinteract.message.application.event.MessageEventHandler;
 import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
