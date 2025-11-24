@@ -64,7 +64,7 @@ public class AuthService {
             throw new BusinessException(ErrorCode.INVALID_USERINFO);
         }
 
-        TokenDto token = jwtProvider.generateToken(dto.name(), dto.role());
+        TokenDto token = jwtProvider.generateToken(dto.userId(), dto.name(), dto.role());
 
         refreshTokenRepository.save(dto.name(), token.refreshToken(), jwtProvider.getRefreshExpiration());
 
@@ -84,7 +84,7 @@ public class AuthService {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
-        TokenDto newToken = jwtProvider.generateToken(name, claims.get("role", String.class));
+        TokenDto newToken = jwtProvider.generateToken(claims.get("userId", Long.class), name, claims.get("role", String.class));
 
         refreshTokenRepository.save(name, newToken.refreshToken(), jwtProvider.getRefreshExpiration());
 
