@@ -6,6 +6,8 @@ import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.ApproveReq;
+import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.BelongReq;
+import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.GetOrganizationReq;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.res.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +39,20 @@ public class UserController {
     public ResponseEntity<ApiRes<UserDetailRes>> getUser(@PathVariable Long userId) {
         return ResponseEntity.ok(
             ApiRes.success(UserDetailRes.from(userService.getUser(userId)))
+        );
+    }
+
+    @GetMapping("/service/{userId}")
+    public ResponseEntity<GetOrganizationRes> getOrganization(@RequestBody GetOrganizationReq getOrganizationReq) {
+        return ResponseEntity.ok(
+            new GetOrganizationRes(userService.getOrganization(getOrganizationReq.userId()))
+        );
+    }
+
+    @GetMapping("/service/isBelong")
+    public ResponseEntity<BelongRes> getBelong(@RequestBody BelongReq belongReq) {
+        return ResponseEntity.ok(
+            new BelongRes(userService.getBelong(belongReq.userId(), belongReq.hubId()))
         );
     }
 
