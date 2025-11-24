@@ -32,8 +32,7 @@ public class MessageController {
 
     @GetMapping("/{messageId}")
     @CheckUserAccess(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_DRIVER},
-        checkResult = true
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<MessageRes>> getMessage(UserContext userContext, @PathVariable UUID messageId) {
         return ResponseEntity.ok(
@@ -45,7 +44,7 @@ public class MessageController {
 
     @GetMapping("/user/{userId}")
     @CheckUserAccess(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_DRIVER}
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<MessageRes>>> getMessages(
         UserContext userContext,
