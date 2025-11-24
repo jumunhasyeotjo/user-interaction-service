@@ -42,14 +42,14 @@ public class UserController {
         );
     }
 
-    @GetMapping("/service/{userId}")
+    @GetMapping("/service/getOrganization")
     public ResponseEntity<GetOrganizationRes> getOrganization(@RequestBody GetOrganizationReq getOrganizationReq) {
         return ResponseEntity.ok(
             new GetOrganizationRes(userService.getOrganization(getOrganizationReq.userId()))
         );
     }
 
-    @GetMapping("/service/isBelong")
+    @GetMapping("/service/getBelong")
     public ResponseEntity<BelongRes> getBelong(@RequestBody BelongReq belongReq) {
         return ResponseEntity.ok(
             new BelongRes(userService.getBelong(belongReq.userId(), belongReq.hubId()))
