@@ -22,10 +22,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -47,18 +50,13 @@ class UserServiceTest {
 
     private User user;
 
-    private void setUser(UserRole role) {
-        user = new User(
-            1L,
+    private void setUser(String role) {
+        user = User.join(
             "Alice",
             "password",
             "slackId",
-            UUID.randomUUID(),
-            UserStatus.PENDING,
             role,
-            null,
-            null,
-            null
+            UUID.randomUUID()
         );
     }
 
@@ -66,7 +64,15 @@ class UserServiceTest {
     @DisplayName("회원 가입 성공")
     void joinWillSuccess() {
         JoinCommand command = new JoinCommand("Alice", "password", "slackId", "HUB_DRIVER", UUID.randomUUID());
+        setUser(UserRole.HUB_DRIVER.name());
         when(userRepository.existsByName("Alice")).thenReturn(false);
+
+        when(userRepository.save(any())).thenAnswer(invocation -> {
+            invocation.getArgument(0);
+            ReflectionTestUtils.setField(user, "userId", 1L);
+            return user;
+        });
+
 
         UserResult result = userService.join(command);
 
@@ -87,7 +93,7 @@ class UserServiceTest {
     void approveWillSuccess() {
         Long userId = 1L;
         ApproveCommand command = new ApproveCommand(userId, "APPROVED");
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
 
         when(userRepository.findById(userId)).thenReturn(user);
 
@@ -100,7 +106,7 @@ class UserServiceTest {
     @DisplayName("단일 회원 조회 성공")
     void getUserWillSuccess() {
         Long userId = 1L;
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
         when(userRepository.findById(userId)).thenReturn(user);
 
         UserResult result = userService.getUser(userId);
@@ -112,7 +118,7 @@ class UserServiceTest {
     @DisplayName("모든 회원 페이지 조회 성공")
     void getUsersWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
         Page<User> page = new PageImpl<>(List.of(user));
         when(userRepository.findAll(pageable)).thenReturn(page);
 
@@ -126,7 +132,7 @@ class UserServiceTest {
     void getUsersByStatusWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UserStatus status = UserStatus.APPROVED;
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
         Page<User> page = new PageImpl<>(List.of(user));
         when(userRepository.findAllByStatus(pageable, status)).thenReturn(page);
 
@@ -140,7 +146,7 @@ class UserServiceTest {
     void getUsersByRoleWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UserRole role = UserRole.HUB_DRIVER;
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
         Page<User> page = new PageImpl<>(List.of(user));
         when(userRepository.findAllByRole(pageable, role)).thenReturn(page);
 
@@ -154,7 +160,7 @@ class UserServiceTest {
     void getCompanyDriverByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID hubId = UUID.randomUUID();
-        setUser(UserRole.COMPANY_DRIVER);
+        setUser(UserRole.COMPANY_DRIVER.name());
         Driver target = new Driver(user);
         user.approve(target, UserStatus.APPROVED);
         Page<User> page = new PageImpl<>(List.of(user));
@@ -169,7 +175,7 @@ class UserServiceTest {
     @DisplayName("허브 운전자 페이지 조회 성공")
     void getHubDriverByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
-        setUser(UserRole.HUB_DRIVER);
+        setUser(UserRole.HUB_DRIVER.name());
         Driver target = new Driver(user);
         user.approve(target, UserStatus.APPROVED);
         Page<User> page = new PageImpl<>(List.of(user));
@@ -185,7 +191,7 @@ class UserServiceTest {
     void getHubManagerByHubIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID hubId = UUID.randomUUID();
-        setUser(UserRole.HUB_MANAGER);
+        setUser(UserRole.HUB_MANAGER.name());
         HubManager target = new HubManager(user);
         user.approve(target, UserStatus.APPROVED);
         Page<User> page = new PageImpl<>(List.of(user));
@@ -201,7 +207,7 @@ class UserServiceTest {
     void getCompanyManagerByCompanyIdWillSuccess() {
         Pageable pageable = PageRequest.of(0, 10);
         UUID companyId = UUID.randomUUID();
-        setUser(UserRole.COMPANY_MANAGER);
+        setUser(UserRole.COMPANY_MANAGER.name());
         CompanyManager target = new CompanyManager(user);
         user.approve(target, UserStatus.APPROVED);
         Page<User> page = new PageImpl<>(List.of(user));
@@ -216,11 +222,16 @@ class UserServiceTest {
     @DisplayName("회원 삭제 성공")
     void deleteUserWillSuccess() {
         Long userId = 1L;
-        User user = mock(User.class);
-        when(userRepository.findById(userId)).thenReturn(user);
+        setUser(UserRole.HUB_DRIVER.name());
+        when(userRepository.findById(userId)).thenAnswer(invocation -> {
+            invocation.getArgument(0);
+            ReflectionTestUtils.setField(user, "userId", 1L);
+            return user;
+        });
 
         userService.deleteUser(userId);
 
-        verify(user).markDeleted(1L);
+        assertThat(user.isDeleted()).isTrue();
+        assertThat(user.getDeletedBy()).isEqualTo(1L);
     }
 }

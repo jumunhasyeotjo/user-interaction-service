@@ -37,19 +37,20 @@ public class JwtProviderImpl implements JwtProvider {
     }
 
     @Override
-    public TokenDto generateToken(String name, String role) {
-        String accessToken = createAccessToken(name, role);
+    public TokenDto generateToken(Long userId, String name, String role) {
+        String accessToken = createAccessToken(userId, name, role);
         String refreshToken = createRefreshToken(name);
 
         return TokenDto.of(accessToken, refreshToken);
     }
 
-    public String createAccessToken(String name, String role) {
+    public String createAccessToken(Long userId, String name, String role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
             Jwts.builder()
                 .setSubject(name)
+                .claim("userId", userId)
                 .claim("role", role)
                 .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRATION))
                 .setIssuedAt(date)

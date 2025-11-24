@@ -1,4 +1,4 @@
-package com.jumunhasyeotjo.userinteract.user.application.event;
+package com.jumunhasyeotjo.userinteract.message.applcation.event;
 
 import com.jumunhasyeotjo.userinteract.message.application.event.MessageEventHandler;
 import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
@@ -33,7 +33,7 @@ class MessageEventHandlerTest {
 
     @Test
     @DisplayName("비동기 이벤트 작동 확인 테스트")
-    void handleMessageCreated_shouldCallSlackClient() throws InterruptedException {
+    void handleMessageCreatedWillCallSlackClient() throws InterruptedException {
         // given
         MessageCreatedEvent event = new MessageCreatedEvent(
             Message.create(UserId.of(1L), Content.of("hi")),
@@ -55,7 +55,7 @@ class MessageEventHandlerTest {
 
     @Test
     @DisplayName("이벤트 실패 시 메시지 전송이 되지 않음")
-    void handleMessageCreated_shouldRetryAndRecover() {
+    void handleMessageCreatedWillRetryAndRecover() {
         MessageCreatedEvent event = new MessageCreatedEvent(
             Message.create(UserId.of(1L), Content.of("hi")),
             "U12345"

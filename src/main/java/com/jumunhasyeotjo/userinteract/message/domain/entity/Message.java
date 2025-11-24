@@ -17,7 +17,6 @@ import java.util.UUID;
 @Table(name = "p_message")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Message {
     @Id
