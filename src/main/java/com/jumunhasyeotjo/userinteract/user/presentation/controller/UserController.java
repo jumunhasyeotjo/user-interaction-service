@@ -1,8 +1,13 @@
 package com.jumunhasyeotjo.userinteract.user.presentation.controller;
 
 import com.jumunhasyeotjo.userinteract.common.ApiRes;
+import com.jumunhasyeotjo.userinteract.common.annotation.CheckUserAccess;
+import com.jumunhasyeotjo.userinteract.common.entity.UserContext;
+import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
+import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.user.application.UserService;
 import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
+import com.jumunhasyeotjo.userinteract.user.application.dto.UserResult;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.ApproveReq;
@@ -14,6 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,39 +29,78 @@ public class UserController {
     private final UserService userService;
 
     @PatchMapping("/approve")
-    public ResponseEntity<ApiRes<UserDetailRes>> approveUser(@RequestBody ApproveReq req) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<UserDetailRes>> approveUser(
+        UserContext userContext,
+        @RequestBody ApproveReq req
+    ) {
         ApproveCommand command = new ApproveCommand(
             req.userId(),
             req.status()
         );
+
+        UserResult userResult = userService.approve(command);
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userService.approve(command)))
+            ApiRes.success(UserDetailRes.from(userResult))
         );
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiRes<UserDetailRes>> getUser(@PathVariable Long userId) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
+        checkResult = true
+    )
+    public ResponseEntity<ApiRes<UserDetailRes>> getUser(
+        UserContext userContext,
+        @PathVariable Long userId
+    ) {
+        UserResult userResult = userService.getUser(userId);
+
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userService.getUser(userId)))
+            ApiRes.success(UserDetailRes.from(userResult))
         );
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(@PathVariable String name) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
+        checkResult = true
+    )
+    public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(
+        UserContext userContext,
+        @PathVariable String name
+    ) {
+        UserResult userResult = userService.getUserByName(name);
+
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userService.getUserByName(name)))
+            ApiRes.success(UserDetailRes.from(userResult))
         );
     }
 
     @GetMapping("/")
-    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
+    ) {
         return ResponseEntity.ok(
             ApiRes.success(userService.getUsers(pageable).map(UserDetailRes::from))
         );
     }
 
     @GetMapping("/status/{req}")
-    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByStatus(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable String req) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByStatus(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @PathVariable String req
+    ) {
         UserStatus status = UserStatus.of(req);
         return ResponseEntity.ok(
             ApiRes.success(userService.getUsersByStatus(pageable, status).map(UserDetailRes::from))
@@ -63,7 +108,14 @@ public class UserController {
     }
 
     @GetMapping("/role/{req}")
-    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByRole(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @RequestParam String req) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByRole(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @RequestParam String req
+    ) {
         UserRole role = UserRole.of(req);
         return ResponseEntity.ok(
             ApiRes.success(userService.getUsersByRole(pageable, role).map(UserDetailRes::from))
@@ -71,40 +123,86 @@ public class UserController {
     }
 
     @GetMapping("/companyDriver/{hubId}")
-    public ResponseEntity<ApiRes<Page<CompanyDriverDetailRes>>> getCompanyDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<CompanyDriverDetailRes>>> getCompanyDriverByHubId(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @PathVariable UUID hubId
+    ) {
         return ResponseEntity.ok(
             ApiRes.success(userService.getCompanyDriverByHubId(pageable, hubId).map(CompanyDriverDetailRes::from))
         );
     }
 
     @GetMapping("/hubDriver")
-    public ResponseEntity<ApiRes<Page<HubDriverDetailRes>>> getHubDriverByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<HubDriverDetailRes>>> getHubDriverByHubId(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
+    ) {
         return ResponseEntity.ok(
             ApiRes.success(userService.getHubDriverByHubId(pageable).map(HubDriverDetailRes::from))
         );
     }
 
     @GetMapping("/hubManager/{hubId}")
-    public ResponseEntity<ApiRes<Page<HubManagerDetailRes>>> getHubManagerByHubId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID hubId) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<HubManagerDetailRes>>> getHubManagerByHubId(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @PathVariable UUID hubId
+    ) {
         return ResponseEntity.ok(
             ApiRes.success(userService.getHubManagerByHubId(pageable, hubId).map(HubManagerDetailRes::from))
         );
     }
 
     @GetMapping("/companyManager/{companyId}")
-    public ResponseEntity<ApiRes<Page<CompanyManagerDetailRes>>> getCompanyManagerByCompanyId(@PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable, @PathVariable UUID companyId) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
+    )
+    public ResponseEntity<ApiRes<Page<CompanyManagerDetailRes>>> getCompanyManagerByCompanyId(
+        UserContext userContext,
+        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @PathVariable UUID companyId
+    ) {
         return ResponseEntity.ok(
             ApiRes.success(userService.getCompanyManagerByCompanyId(pageable, companyId).map(CompanyManagerDetailRes::from))
         );
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(@PathVariable Long userId) {
+    @CheckUserAccess(
+        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
+        checkResult = true
+    )
+    public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(
+        UserContext userContext,
+        @PathVariable Long userId
+    ) {
         userService.deleteUser(userId);
         return ResponseEntity.ok(
             ApiRes.success(UserDetailRes.from(userService.deleteUser(userId)))
         );
     }
 
+    @GetMapping("/service/getOrganization")
+    public ResponseEntity<GetOrganizationRes> getOrganization(@RequestParam Long userId) {
+        return ResponseEntity.ok(
+            new GetOrganizationRes(userService.getOrganization(userId))
+        );
+    }
 
+    @GetMapping("/service/getBelong")
+    public ResponseEntity<BelongRes> getBelong(@RequestParam Long userId, @RequestParam UUID hubId) {
+        return ResponseEntity.ok(
+            new BelongRes(userService.getBelong(userId, hubId))
+        );
+    }
 }

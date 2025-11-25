@@ -14,6 +14,7 @@ public enum ErrorCode {
     CREATE_VALIDATE_EXCEPTION(HttpStatus.BAD_REQUEST,"E005", "객체 생성에 실패했습니다."),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "E006", "입력값 검증에 실패했습니다."),
     INVALID_JSON(HttpStatus.BAD_REQUEST, "E007",  "잘못된 JSON 형식입니다."),
+    MISSING_AUTH_HEADERS(HttpStatus.UNAUTHORIZED, "E008",  "헤더가 올바르지 않습니다."),
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "유효한 역할이 아닙니다."),
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "U002", "유효한 상태가 아닙니다.."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U003", "사용자를 찾을 수 없습니다."),

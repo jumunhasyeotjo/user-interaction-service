@@ -68,6 +68,16 @@ public class UserService {
         return UserResult.from(user);
     }
 
+    public UUID getOrganization(Long userId) {
+        User user = userRepository.findById(userId);
+        return user.getBelong();
+    }
+
+    public boolean getBelong(Long userId, UUID hubId) {
+        User user = userRepository.findById(userId);
+        return user.getBelong().equals(hubId);
+    }
+
     @Cacheable(value = "userByName", key = "#name")
     public UserResult getUserByName(String name) {
         User user = userRepository.findByName(name);

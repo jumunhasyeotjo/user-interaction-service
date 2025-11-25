@@ -112,7 +112,7 @@ class AuthServiceTest {
         TokenDto tokenDto = TokenDto.of("access", "refresh");
 
         when(userClient.validate("hong", "pw")).thenReturn(userDto);
-        when(jwtProvider.generateToken(eq("hong"), anyString())).thenReturn(tokenDto);
+        when(jwtProvider.generateToken(eq(1L), eq("hong"), anyString())).thenReturn(tokenDto);
 
         SignInResult result = authService.signIn(command);
 
@@ -132,7 +132,7 @@ class AuthServiceTest {
         when(claims.getSubject()).thenReturn("hong");
         when(claims.get("role", String.class)).thenReturn("MASTER");
         when(refreshTokenRedisRepository.findByName("hong")).thenReturn("refresh");
-        when(jwtProvider.generateToken("hong", "MASTER")).thenReturn(TokenDto.of("newAccess", "newRefresh"));
+        when(jwtProvider.generateToken(1L, "hong", "MASTER")).thenReturn(TokenDto.of("newAccess", "newRefresh"));
 
         SignInResult result = authService.reissue(refreshToken);
 
