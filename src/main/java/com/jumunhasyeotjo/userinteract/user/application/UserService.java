@@ -126,9 +126,9 @@ public class UserService {
         @CacheEvict(value = "user", key = "#result.userId()"),
         @CacheEvict(value = "userByName", key = "#result.name()")
     })
-    public UserResult deleteUser(Long userId) {
+    public UserResult deleteUser(Long userId, Long requesterId) {
         User user = userRepository.findById(userId);
-        user.markDeleted(1L); // 추후 수정 필요
+        user.markDeleted(requesterId); // 추후 수정 필요
         return UserResult.from(user);
     }
 }

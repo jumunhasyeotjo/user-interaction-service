@@ -1,10 +1,7 @@
 package com.jumunhasyeotjo.userinteract.user.presentation.controller;
 
 import com.jumunhasyeotjo.userinteract.common.ApiRes;
-import com.jumunhasyeotjo.userinteract.common.annotation.CheckUserAccess;
-import com.jumunhasyeotjo.userinteract.common.entity.UserContext;
-import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
-import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
+import com.jumunhasyeotjo.userinteract.common.annotation.PassportAuthorize;
 import com.jumunhasyeotjo.userinteract.user.application.UserService;
 import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
 import com.jumunhasyeotjo.userinteract.user.application.dto.UserResult;
@@ -12,6 +9,8 @@ import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.ApproveReq;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.res.*;
+import com.library.passport.annotation.PassportUser;
+import com.library.passport.proto.PassportProto.Passport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,11 +27,11 @@ public class UserController {
     private final UserService userService;
 
     @PatchMapping("/approve")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<UserDetailRes>> approveUser(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @RequestBody ApproveReq req
     ) {
         ApproveCommand command = new ApproveCommand(
@@ -48,28 +46,28 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> getUser(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PathVariable Long userId
     ) {
+        System.out.println("UserController.getUser: " + userId);
         UserResult userResult = userService.getUser(userId);
-
         return ResponseEntity.ok(
             ApiRes.success(UserDetailRes.from(userResult))
         );
     }
 
     @GetMapping("/name/{name}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PathVariable String name
     ) {
         UserResult userResult = userService.getUserByName(name);
@@ -80,11 +78,11 @@ public class UserController {
     }
 
     @GetMapping("/")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -93,11 +91,11 @@ public class UserController {
     }
 
     @GetMapping("/status/{req}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByStatus(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
         @PathVariable String req
     ) {
@@ -108,11 +106,11 @@ public class UserController {
     }
 
     @GetMapping("/role/{req}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByRole(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
         @RequestParam String req
     ) {
@@ -123,11 +121,11 @@ public class UserController {
     }
 
     @GetMapping("/companyDriver/{hubId}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<CompanyDriverDetailRes>>> getCompanyDriverByHubId(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
         @PathVariable UUID hubId
     ) {
@@ -137,11 +135,11 @@ public class UserController {
     }
 
     @GetMapping("/hubDriver")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<HubDriverDetailRes>>> getHubDriverByHubId(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
     ) {
         return ResponseEntity.ok(
@@ -150,11 +148,11 @@ public class UserController {
     }
 
     @GetMapping("/hubManager/{hubId}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<HubManagerDetailRes>>> getHubManagerByHubId(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
         @PathVariable UUID hubId
     ) {
@@ -164,11 +162,11 @@ public class UserController {
     }
 
     @GetMapping("/companyManager/{companyId}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
     )
     public ResponseEntity<ApiRes<Page<CompanyManagerDetailRes>>> getCompanyManagerByCompanyId(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
         @PathVariable UUID companyId
     ) {
@@ -178,17 +176,16 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    @CheckUserAccess(
+    @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(
-        UserContext userContext,
+        @PassportUser Passport passport,
         @PathVariable Long userId
     ) {
-        userService.deleteUser(userId);
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userService.deleteUser(userId)))
+            ApiRes.success(UserDetailRes.from(userService.deleteUser(userId, passport.getUserId())))
         );
     }
 
