@@ -37,7 +37,6 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<ApiRes<SignInRes>> signIn(@RequestBody SignInReq req) {
-        System.out.println(req.name());
         SignInCommand command = new SignInCommand(
             req.name(),
             req.password()

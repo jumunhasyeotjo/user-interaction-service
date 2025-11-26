@@ -13,7 +13,6 @@ public class PassportController {
 
     @PostMapping()
     public PassportRes issuePassport(@RequestParam("jwt") String jwt) {
-        System.out.println(jwt);
         return PassportRes.fromPassportResult(passportService.issuePassport(jwt));
     }
 }
