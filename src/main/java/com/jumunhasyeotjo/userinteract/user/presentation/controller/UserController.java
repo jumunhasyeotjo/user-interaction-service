@@ -54,7 +54,6 @@ public class UserController {
         @PassportUser Passport passport,
         @PathVariable Long userId
     ) {
-        System.out.println(passport.getBelong());
         UserResult userResult = userService.getUser(userId);
         return ResponseEntity.ok(
             ApiRes.success(UserDetailRes.from(userResult))
