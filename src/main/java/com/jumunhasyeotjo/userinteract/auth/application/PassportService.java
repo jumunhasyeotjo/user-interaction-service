@@ -32,16 +32,17 @@ public class PassportService {
         String name = claims.getSubject();
         Long userId = claims.get("userId", Long.class);
         String role = claims.get("role", String.class);
+        String belong = claims.get("belong", String.class);
 
 
         // 3) Passport 발급 (HMAC+Protobuf)
-        String passport = generatePassport(userId, name, role);
+        String passport = generatePassport(userId, name, role, belong);
 
         // 4) JSON 응답
         return PassportResult.convertToIssuePassportResponse(passport);
     }
 
-    private String generatePassport(Long userId, String name, String role) {
+    private String generatePassport(Long userId, String name, String role, String belong) {
         long now = Instant.now().getEpochSecond();
         long expire = now + EXPIRE_SECONDS;
 
@@ -51,6 +52,7 @@ public class PassportService {
             .setUserId(userId)
             .setName(name)
             .setRole(role)
+            .setBelong(belong)
             .setIssuedAt(now)
             .setExpiresAt(expire)
             .build();

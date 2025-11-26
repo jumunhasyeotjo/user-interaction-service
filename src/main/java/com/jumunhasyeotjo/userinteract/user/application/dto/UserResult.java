@@ -10,6 +10,7 @@ public record UserResult (
     String name,
     String slackId,
     String role,
+    UUID belong,
     String status,
     LocalDateTime createdAt
 ) {
@@ -19,6 +20,7 @@ public record UserResult (
             user.getName(),
             user.getSlackId(),
             user.getRole().name(),
+            user.getBelong(),
             user.getStatus().name(),
             user.getCreatedAt()
         );

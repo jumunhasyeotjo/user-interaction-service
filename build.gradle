@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'com.library:passport:1.0.0'
+	implementation 'com.library:passport:1.0.1'
 	implementation 'com.google.protobuf:protobuf-java:3.21.12'
 
 	implementation 'com.slack.api:slack-api-client:1.40.0'

@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -37,14 +38,14 @@ public class JwtProviderImpl implements JwtProvider {
     }
 
     @Override
-    public TokenDto generateToken(Long userId, String name, String role) {
-        String accessToken = createAccessToken(userId, name, role);
+    public TokenDto generateToken(Long userId, String name, String role, UUID belong) {
+        String accessToken = createAccessToken(userId, name, role, belong);
         String refreshToken = createRefreshToken(name);
 
         return TokenDto.of(accessToken, refreshToken);
     }
 
-    public String createAccessToken(Long userId, String name, String role) {
+    public String createAccessToken(Long userId, String name, String role, UUID belong) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -52,6 +53,7 @@ public class JwtProviderImpl implements JwtProvider {
                 .setSubject(name)
                 .claim("userId", userId)
                 .claim("role", role)
+                .claim("belong", belong)
                 .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_EXPIRATION))
                 .setIssuedAt(date)
                 .signWith(key, signatureAlgorithm)
