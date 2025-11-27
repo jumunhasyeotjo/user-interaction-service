@@ -109,7 +109,7 @@ class UserControllerTest {
             "PENDING",
             LocalDateTime.now()
         );
-        BDDMockito.given(userService.deleteUser(1L)).willReturn(mockResult);
+        BDDMockito.given(userService.deleteUser(1L, 1L)).willReturn(mockResult);
 
         // when, then
         mockMvc.perform(delete("/v1/users/{userId}", 1L))

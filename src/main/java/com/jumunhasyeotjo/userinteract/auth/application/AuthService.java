@@ -7,6 +7,7 @@ import com.jumunhasyeotjo.userinteract.auth.application.result.SignUpResult;
 import com.jumunhasyeotjo.userinteract.auth.application.service.*;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.JoinReq;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.TokenDto;
+import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDetailDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDto;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.Role;
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
@@ -59,12 +60,12 @@ public class AuthService {
     }
 
     public SignInResult signIn(SignInCommand command) {
-        UserDto dto = userClient.validate(command.name(), command.password());
+        UserDetailDto dto = userClient.validate(command.name(), command.password());
         if (dto == null) {
             throw new BusinessException(ErrorCode.INVALID_USERINFO);
         }
 
-        TokenDto token = jwtProvider.generateToken(dto.userId(), dto.name(), dto.role());
+        TokenDto token = jwtProvider.generateToken(dto.userId(), dto.name(), dto.role(), dto.belong());
 
         refreshTokenRepository.save(dto.name(), token.refreshToken(), jwtProvider.getRefreshExpiration());
 
@@ -84,7 +85,12 @@ public class AuthService {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
 
-        TokenDto newToken = jwtProvider.generateToken(claims.get("userId", Long.class), name, claims.get("role", String.class));
+        TokenDto newToken = jwtProvider.generateToken(
+            claims.get("userId", Long.class),
+            name,
+            claims.get("role", String.class),
+            UUID.fromString(claims.get("belong", String.class))
+        );
 
         refreshTokenRepository.save(name, newToken.refreshToken(), jwtProvider.getRefreshExpiration());
 

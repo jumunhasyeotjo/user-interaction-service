@@ -229,7 +229,7 @@ class UserServiceTest {
             return user;
         });
 
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, 1L);
 
         assertThat(user.isDeleted()).isTrue();
         assertThat(user.getDeletedBy()).isEqualTo(1L);

@@ -9,6 +9,7 @@ import com.jumunhasyeotjo.userinteract.auth.application.service.HubClient;
 import com.jumunhasyeotjo.userinteract.auth.application.service.JwtProvider;
 import com.jumunhasyeotjo.userinteract.auth.application.service.UserClient;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.TokenDto;
+import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDetailDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.RefreshTokenRedisRepository;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.repository.BlacklistRedisRepository;
@@ -101,18 +102,19 @@ class AuthServiceTest {
     @DisplayName("로그인 성공")
     void signInWillSuccess() {
         SignInCommand command = new SignInCommand("hong", "pw");
-        UserDto userDto = new UserDto(
+        UserDetailDto userDto = new UserDetailDto(
             1L,
             "hong",
             "slackId",
             "HUB_DRIVER",
+            UUID.randomUUID(),
             "PENDING",
             LocalDateTime.now()
         );
         TokenDto tokenDto = TokenDto.of("access", "refresh");
 
         when(userClient.validate("hong", "pw")).thenReturn(userDto);
-        when(jwtProvider.generateToken(eq(1L), eq("hong"), anyString())).thenReturn(tokenDto);
+        when(jwtProvider.generateToken(eq(1L), eq("hong"), anyString(), UUID.randomUUID())).thenReturn(tokenDto);
 
         SignInResult result = authService.signIn(command);
 
@@ -132,7 +134,7 @@ class AuthServiceTest {
         when(claims.getSubject()).thenReturn("hong");
         when(claims.get("role", String.class)).thenReturn("MASTER");
         when(refreshTokenRedisRepository.findByName("hong")).thenReturn("refresh");
-        when(jwtProvider.generateToken(1L, "hong", "MASTER")).thenReturn(TokenDto.of("newAccess", "newRefresh"));
+        when(jwtProvider.generateToken(1L, "hong", "MASTER", UUID.randomUUID())).thenReturn(TokenDto.of("newAccess", "newRefresh"));
 
         SignInResult result = authService.reissue(refreshToken);
 
