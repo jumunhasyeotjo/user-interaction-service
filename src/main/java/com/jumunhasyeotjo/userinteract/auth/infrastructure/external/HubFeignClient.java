@@ -9,10 +9,9 @@ import java.util.UUID;
 
 @FeignClient(
     name = "hub-service",
-    url = "http://localhost:8087"
+    url = "lb://hub-product-stock-company"
 )
-public interface HubFeignClient extends HubClient {
-    @Override
+public interface HubFeignClient {
     @GetMapping("/api/v1/hubs/exist/{hubId}")
     boolean exist(@PathVariable("hubId") UUID hubId);
 }
