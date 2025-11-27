@@ -18,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -119,61 +120,6 @@ public class UserController {
         );
     }
 
-    @GetMapping("/companyDriver/{hubId}")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
-    public ResponseEntity<ApiRes<Page<CompanyDriverDetailRes>>> getCompanyDriverByHubId(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
-        @PathVariable UUID hubId
-    ) {
-        return ResponseEntity.ok(
-            ApiRes.success(userService.getCompanyDriverByHubId(pageable, hubId).map(CompanyDriverDetailRes::from))
-        );
-    }
-
-    @GetMapping("/hubDriver")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
-    public ResponseEntity<ApiRes<Page<HubDriverDetailRes>>> getHubDriverByHubId(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-            ApiRes.success(userService.getHubDriverByHubId(pageable).map(HubDriverDetailRes::from))
-        );
-    }
-
-    @GetMapping("/hubManager/{hubId}")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
-    public ResponseEntity<ApiRes<Page<HubManagerDetailRes>>> getHubManagerByHubId(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
-        @PathVariable UUID hubId
-    ) {
-        return ResponseEntity.ok(
-            ApiRes.success(userService.getHubManagerByHubId(pageable, hubId).map(HubManagerDetailRes::from))
-        );
-    }
-
-    @GetMapping("/companyManager/{companyId}")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
-    public ResponseEntity<ApiRes<Page<CompanyManagerDetailRes>>> getCompanyManagerByCompanyId(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
-        @PathVariable UUID companyId
-    ) {
-        return ResponseEntity.ok(
-            ApiRes.success(userService.getCompanyManagerByCompanyId(pageable, companyId).map(CompanyManagerDetailRes::from))
-        );
-    }
-
     @DeleteMapping("/{userId}")
     @PassportAuthorize(
         allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
@@ -185,20 +131,6 @@ public class UserController {
     ) {
         return ResponseEntity.ok(
             ApiRes.success(UserDetailRes.from(userService.deleteUser(userId, passport.getUserId())))
-        );
-    }
-
-    @GetMapping("/service/getOrganization")
-    public ResponseEntity<GetOrganizationRes> getOrganization(@RequestParam Long userId) {
-        return ResponseEntity.ok(
-            new GetOrganizationRes(userService.getOrganization(userId))
-        );
-    }
-
-    @GetMapping("/service/getBelong")
-    public ResponseEntity<BelongRes> getBelong(@RequestParam Long userId, @RequestParam UUID hubId) {
-        return ResponseEntity.ok(
-            new BelongRes(userService.getBelong(userId, hubId))
         );
     }
 }

@@ -1,6 +1,5 @@
 package com.jumunhasyeotjo.userinteract.message.infrastructure.external;
 
-import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
 import com.slack.api.Slack;
@@ -21,48 +20,44 @@ public class SlackClientImpl implements SlackClient {
     private final Slack slack = Slack.getInstance();
 
     @Override
-    public void sendMessage(String userId, String message) {
-        String channelId = openChannel(userId);
-        if (channelId == null) {
-            throw new BusinessException(ErrorCode.GET_CHANNEL_FAILED);
-        }
-
-        boolean response = sendMessageToChannel(channelId, message);
-
-        if (!response) {
-            log.error("Failed to send message");
-            throw new BusinessException(ErrorCode.SEND_MESSAGE_FAILED);
-        }
+    public void sendMessage(List<String> userIds, String message) {
+        String channelId = openChannel(userIds);
+        sendMessageToChannel(channelId, message);
     }
 
-    private String openChannel(String userId) {
+    private String openChannel(List<String> userIds) {
         try {
             var response = slack.methods(botToken).conversationsOpen(
-                req -> req.users(List.of(userId))
+                req -> req.users(userIds)
             );
 
             if (!response.isOk()) {
                 log.error("Slack channel open failed: {}", response.getError());
-                return null;
+                throw new RuntimeException(ErrorCode.GET_CHANNEL_FAILED.getMessage());
             }
 
             return response.getChannel().getId();
+
         } catch (SlackApiException | IOException e) {
-            log.error("Slack API error in conversations.open", e);
-            return null;
+            log.error("Slack API error during conversations.open", e);
+            throw new RuntimeException(ErrorCode.GET_CHANNEL_FAILED.getMessage());
         }
     }
 
-    private boolean sendMessageToChannel(String channelId, String message) {
+    private void sendMessageToChannel(String channelId, String message) {
         try {
             var response = slack.methods(botToken).chatPostMessage(
                 req -> req.channel(channelId).text(message)
             );
 
-            return response.isOk();
+            if (!response.isOk()) {
+                log.error("Slack message send failed: {}", response.getError());
+                throw new RuntimeException(ErrorCode.SEND_MESSAGE_FAILED.getMessage());
+            }
+
         } catch (SlackApiException | IOException e) {
-            log.error("Slack API error in conversations.open", e);
-            return false;
+            log.error("Slack API error during chat.postMessage", e);
+            throw new RuntimeException(ErrorCode.SEND_MESSAGE_FAILED.getMessage());
         }
     }
 }

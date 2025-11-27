@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -21,6 +22,11 @@ public class MessageRepositoryAdaptor implements MessageRepository {
     @Override
     public Message save(Message message) {
         return jpaRepository.save(message);
+    }
+
+    @Override
+    public List<Message> saveAll(List<Message> messages) {
+        return jpaRepository.saveAll(messages);
     }
 
     @Override

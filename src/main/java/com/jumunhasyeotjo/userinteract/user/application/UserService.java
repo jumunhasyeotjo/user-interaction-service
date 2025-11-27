@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -68,16 +69,6 @@ public class UserService {
         return UserResult.from(user);
     }
 
-    public UUID getOrganization(Long userId) {
-        User user = userRepository.findById(userId);
-        return user.getBelong();
-    }
-
-    public boolean getBelong(Long userId, UUID hubId) {
-        User user = userRepository.findById(userId);
-        return user.getBelong().equals(hubId);
-    }
-
     @Cacheable(value = "userByName", key = "#name")
     public UserResult getUserByName(String name) {
         User user = userRepository.findByName(name);
@@ -96,20 +87,14 @@ public class UserService {
         return userRepository.findAllByRole(pageable, role).map(UserResult::from);
     }
 
-    public Page<CompanyDriverResult> getCompanyDriverByHubId(Pageable pageable, UUID hubId) {
-        return userRepository.findCompanyDriverByHubId(pageable, hubId).map(CompanyDriverResult::from);
+    public List<HubManagerResult> getHubManagerByHubId(UUID hubId) {
+        return userRepository.findHubManagerByHubId(hubId)
+            .stream().map(HubManagerResult::from).toList();
     }
 
-    public Page<HubDriverResult> getHubDriverByHubId(Pageable pageable) {
-        return userRepository.findHubDriverByHubId(pageable).map(HubDriverResult::from);
-    }
-
-    public Page<HubManagerResult> getHubManagerByHubId(Pageable pageable, UUID hubId) {
-        return userRepository.findHubManagerByHubId(pageable, hubId).map(HubManagerResult::from);
-    }
-
-    public Page<CompanyManagerResult> getCompanyManagerByCompanyId(Pageable pageable, UUID companyId) {
-        return userRepository.findCompanyManagerByCompanyId(pageable, companyId).map(CompanyManagerResult::from);
+    public List<CompanyManagerResult> getCompanyManagerByCompanyId(UUID companyId) {
+        return userRepository.findCompanyManagerByCompanyId(companyId)
+            .stream().map(CompanyManagerResult::from).toList();
     }
 
     public UserResult validatePassword(String name, String rawPassword) {

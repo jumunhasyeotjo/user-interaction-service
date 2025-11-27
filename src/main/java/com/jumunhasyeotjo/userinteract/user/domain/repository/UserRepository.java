@@ -6,6 +6,7 @@ import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository {
@@ -16,10 +17,8 @@ public interface UserRepository {
     Page<User> findAll(Pageable pageable);
     Page<User> findAllByStatus(Pageable pageable, UserStatus status);
     Page<User> findAllByRole(Pageable pageable, UserRole role);
-    Page<User> findCompanyDriverByHubId(Pageable pageable, UUID hubId);
-    Page<User> findHubDriverByHubId(Pageable pageable);
-    Page<User> findHubManagerByHubId(Pageable pageable, UUID hubId);
-    Page<User> findCompanyManagerByCompanyId(Pageable pageable, UUID companyId);
+    List<User> findHubManagerByHubId(UUID hubId);
+    List<User> findCompanyManagerByCompanyId(UUID companyId);
     Integer findMaxDriverOrderByHubId(UUID hubId);
     Integer findMaxHubDriverOrder();
 }
