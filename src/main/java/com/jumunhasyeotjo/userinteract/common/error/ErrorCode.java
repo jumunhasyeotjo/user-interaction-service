@@ -30,6 +30,8 @@ public enum ErrorCode {
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "M002", "메세지의 컨텐츠가 유효하지 않습니다."),
     GET_CHANNEL_FAILED(HttpStatus.BAD_REQUEST, "M003", "채널을 생성/조회하는 것을 실패했습니다."),
     SEND_MESSAGE_FAILED(HttpStatus.BAD_REQUEST, "M004", "메세지 송신에 실패하였습니다."),
+    HUB_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "H001", "허브 서비스의 사용이 불가능합니다."),
+    COMPANY_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C001", "업체 서비스의 사용이 불가능합니다."),
 
 
 

@@ -9,10 +9,9 @@ import java.util.UUID;
 
 @FeignClient(
     name = "company-service",
-    url = "http://localhost:8087"
+    url = "lb://hub-product-stock-company"
 )
-public interface CompanyFeignClient extends CompanyClient {
-    @Override
+public interface CompanyFeignClient {
     @GetMapping("/api/v1/companies/exist/{companyId}")
     boolean exist(@PathVariable("companyId") UUID companyId);
 }
