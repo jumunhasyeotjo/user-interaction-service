@@ -94,67 +94,19 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Page<User> findCompanyDriverByHubId(Pageable pageable, UUID hubId) {
-        List<User> content = queryFactory.selectFrom(user)
-            .join(user.driver, driver)
-            .where(driver.hubId.eq(hubId))
-            .fetch();
-
-        Long total = queryFactory
-            .select(driver.count())
-            .from(driver)
-            .where(driver.hubId.eq(hubId))
-            .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
-    }
-
-    @Override
-    public Page<User> findHubDriverByHubId(Pageable pageable) {
-        List<User> content = queryFactory.selectFrom(user)
-            .join(user.driver, driver)
-            .where(driver.hubId.isNull())
-            .fetch();
-
-        Long total = queryFactory
-            .select(driver.count())
-            .from(driver)
-            .where(driver.hubId.isNull())
-            .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
-    }
-
-    @Override
-    public Page<User> findHubManagerByHubId(Pageable pageable, UUID hubId) {
-        List<User> content = queryFactory.selectFrom(user)
+    public List<User> findHubManagerByHubId(UUID hubId) {
+        return queryFactory.selectFrom(user)
             .join(user.hubManager, hubManager)
             .where(hubManager.hubId.eq(hubId))
             .fetch();
-
-        Long total = queryFactory
-            .select(hubManager.count())
-            .from(hubManager)
-            .where(hubManager.hubId.eq(hubId))
-            .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override
-    public Page<User> findCompanyManagerByCompanyId(Pageable pageable, UUID companyId) {
-        List<User> content = queryFactory.selectFrom(user)
+    public List<User> findCompanyManagerByCompanyId(UUID companyId) {
+        return queryFactory.selectFrom(user)
             .join(user.companyManager, companyManager)
             .where(companyManager.companyId.eq(companyId))
             .fetch();
-
-        Long total = queryFactory
-            .select(hubManager.count())
-            .from(hubManager)
-            .where(companyManager.companyId.eq(companyId))
-            .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override

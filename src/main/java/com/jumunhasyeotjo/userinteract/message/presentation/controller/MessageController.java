@@ -4,6 +4,7 @@ import com.jumunhasyeotjo.userinteract.common.ApiRes;
 import com.jumunhasyeotjo.userinteract.common.annotation.PassportAuthorize;
 import com.jumunhasyeotjo.userinteract.message.application.MessageService;
 import com.jumunhasyeotjo.userinteract.message.presentation.dto.req.MessageCreateReq;
+import com.jumunhasyeotjo.userinteract.message.presentation.dto.req.ShippingMessageCreateReq;
 import com.jumunhasyeotjo.userinteract.message.presentation.dto.res.MessageRes;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.library.passport.annotation.PassportUser;
@@ -27,6 +28,13 @@ public class MessageController {
     @PostMapping()
     public ResponseEntity<ApiRes<Void>> createMessage(@RequestBody MessageCreateReq req) {
         messageService.createMessage(req.toCommand());
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiRes.success(null));
+    }
+
+    @PostMapping("/shipping")
+    public ResponseEntity<ApiRes<Void>> createShippingMessage(@RequestBody ShippingMessageCreateReq req) {
+        messageService.createShippingMessage(req.toCommand());
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiRes.success(null));
     }
