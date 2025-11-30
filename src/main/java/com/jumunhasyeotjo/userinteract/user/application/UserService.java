@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -95,6 +96,20 @@ public class UserService {
     public List<CompanyManagerResult> getCompanyManagerByCompanyId(UUID companyId) {
         return userRepository.findCompanyManagerByCompanyId(companyId)
             .stream().map(CompanyManagerResult::from).toList();
+    }
+
+    public HubDriverResult getRandomHubDriver() {
+        List<HubDriverResult> hubDrivers = userRepository.findHubDrivers().stream()
+            .map(HubDriverResult::from).toList();
+
+        return hubDrivers.get(ThreadLocalRandom.current().nextInt(hubDrivers.size()));
+    }
+
+    public CompanyDriverResult getRandomCompanyDriver(UUID hubId) {
+        List<CompanyDriverResult> companyDrivers = userRepository.findCompanyDriversByHubId(hubId).stream()
+            .map(CompanyDriverResult::from).toList();
+
+        return companyDrivers.get(ThreadLocalRandom.current().nextInt(companyDrivers.size()));
     }
 
     public UserResult validatePassword(String name, String rawPassword) {

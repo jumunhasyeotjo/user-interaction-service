@@ -21,4 +21,6 @@ public interface UserRepository {
     List<User> findCompanyManagerByCompanyId(UUID companyId);
     Integer findMaxDriverOrderByHubId(UUID hubId);
     Integer findMaxHubDriverOrder();
+    List<User> findCompanyDriversByHubId(UUID hubId);
+    List<User> findHubDrivers();
 }

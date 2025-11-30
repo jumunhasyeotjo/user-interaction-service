@@ -1,15 +1,15 @@
 package com.jumunhasyeotjo.userinteract.user.presentation.controller;
 
-import com.jumunhasyeotjo.userinteract.common.ApiRes;
-import com.jumunhasyeotjo.userinteract.common.annotation.PassportAuthorize;
 import com.jumunhasyeotjo.userinteract.user.application.UserService;
 import com.jumunhasyeotjo.userinteract.user.application.command.ApproveCommand;
 import com.jumunhasyeotjo.userinteract.user.application.dto.UserResult;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserRole;
 import com.jumunhasyeotjo.userinteract.user.domain.vo.UserStatus;
 import com.jumunhasyeotjo.userinteract.user.presentation.dto.req.ApproveReq;
-import com.jumunhasyeotjo.userinteract.user.presentation.dto.res.*;
+import com.jumunhasyeotjo.userinteract.user.presentation.dto.res.UserDetailRes;
+import com.library.passport.annotation.PassportAuthorize;
 import com.library.passport.annotation.PassportUser;
+import com.library.passport.entity.ApiRes;
 import com.library.passport.proto.PassportProto.Passport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,9 +18,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
@@ -28,9 +25,7 @@ public class UserController {
     private final UserService userService;
 
     @PatchMapping("/approve")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
+    @PassportAuthorize
     public ResponseEntity<ApiRes<UserDetailRes>> approveUser(
         @PassportUser Passport passport,
         @RequestBody ApproveReq req
@@ -48,7 +43,6 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> getUser(
@@ -63,7 +57,6 @@ public class UserController {
 
     @GetMapping("/name/{name}")
     @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(
@@ -78,9 +71,7 @@ public class UserController {
     }
 
     @GetMapping("/")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
+    @PassportAuthorize
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(
         @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
@@ -91,9 +82,7 @@ public class UserController {
     }
 
     @GetMapping("/status/{req}")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
+    @PassportAuthorize
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByStatus(
         @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
@@ -106,9 +95,7 @@ public class UserController {
     }
 
     @GetMapping("/role/{req}")
-    @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER}
-    )
+    @PassportAuthorize
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByRole(
         @PassportUser Passport passport,
         @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
@@ -122,7 +109,6 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PassportAuthorize(
-        allowedRoles = {UserRole.MASTER, UserRole.HUB_MANAGER},
         checkResult = true
     )
     public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(

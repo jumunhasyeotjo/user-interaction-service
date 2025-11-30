@@ -8,7 +8,6 @@ import com.jumunhasyeotjo.userinteract.auth.application.service.*;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.JoinReq;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.TokenDto;
 import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDetailDto;
-import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.UserDto;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.Role;
 import com.jumunhasyeotjo.userinteract.common.error.BusinessException;
 import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
@@ -24,8 +23,7 @@ import java.util.UUID;
 public class AuthService {
     private final JwtProvider jwtProvider;
     private final UserClient userClient;
-    private final HubClient hubClient;
-    private final CompanyClient companyClient;
+    private final HubCompanyClient hubCompanyClient;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -39,11 +37,11 @@ public class AuthService {
         UUID belong = command.belong();
 
         if (role.equals(Role.HUB_MANAGER) || role.equals(Role.COMPANY_DRIVER)) {
-            if (!hubClient.exist(command.belong())) {
+            if (!hubCompanyClient.existHub(command.belong())) {
                 throw new BusinessException(ErrorCode.INVALID_HUB);
             }
         } else if (role.equals(Role.COMPANY_MANAGER)) {
-            if (!companyClient.exist(command.belong())) {
+            if (!hubCompanyClient.existCompany(command.belong())) {
                 throw new BusinessException(ErrorCode.INVALID_COMPANY);
             }
         }

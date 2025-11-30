@@ -8,7 +8,7 @@ import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.SignInReq;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.req.SignUpReq;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.res.SignInRes;
 import com.jumunhasyeotjo.userinteract.auth.presentation.dto.res.SignUpRes;
-import com.jumunhasyeotjo.userinteract.common.ApiRes;
+import com.library.passport.entity.ApiRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

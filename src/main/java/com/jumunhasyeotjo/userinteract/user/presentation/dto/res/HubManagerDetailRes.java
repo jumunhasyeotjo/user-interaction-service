@@ -11,7 +11,7 @@ public record HubManagerDetailRes(
     String name,
     String slackId,
     String role,
-    UUID hubId,
+    String hubId,
     String status,
     LocalDateTime createdAt
 ) {
@@ -21,7 +21,7 @@ public record HubManagerDetailRes(
             user.name(),
             user.slackId(),
             user.role(),
-            user.hubId(),
+            user.hubId().toString(),
             user.status(),
             user.createdAt()
         );
