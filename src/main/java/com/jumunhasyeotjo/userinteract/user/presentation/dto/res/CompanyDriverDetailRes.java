@@ -11,7 +11,7 @@ public record CompanyDriverDetailRes(
     String name,
     String slackId,
     String role,
-    UUID hubId,
+    String hubId,
     Integer deliveryOrder,
     String status,
     LocalDateTime createdAt
@@ -22,7 +22,7 @@ public record CompanyDriverDetailRes(
             user.name(),
             user.slackId(),
             user.role(),
-            user.hubId(),
+            user.hubId().toString(),
             user.deliveryOrder(),
             user.status(),
             user.createdAt()

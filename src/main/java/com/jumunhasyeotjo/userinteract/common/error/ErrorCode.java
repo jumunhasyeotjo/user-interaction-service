@@ -10,7 +10,6 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "서버 에러가 발생했습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "E002", "잘못된 요청입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "E003", "인증이 필요합니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "E004", "접근이 거부되었습니다."),
     CREATE_VALIDATE_EXCEPTION(HttpStatus.BAD_REQUEST,"E005", "객체 생성에 실패했습니다."),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "E006", "입력값 검증에 실패했습니다."),
     INVALID_JSON(HttpStatus.BAD_REQUEST, "E007",  "잘못된 JSON 형식입니다."),
@@ -30,9 +29,8 @@ public enum ErrorCode {
     INVALID_CONTENT(HttpStatus.BAD_REQUEST, "M002", "메세지의 컨텐츠가 유효하지 않습니다."),
     GET_CHANNEL_FAILED(HttpStatus.BAD_REQUEST, "M003", "채널을 생성/조회하는 것을 실패했습니다."),
     SEND_MESSAGE_FAILED(HttpStatus.BAD_REQUEST, "M004", "메세지 송신에 실패하였습니다."),
-    HUB_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "H001", "허브 서비스의 사용이 불가능합니다."),
-    COMPANY_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C001", "업체 서비스의 사용이 불가능합니다."),
-
+    HUBCOMPANY_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "H001", "허브, 업체 서비스의 사용이 불가능합니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "P001", "접근이 거부되었습니다.")
 
 
     ;

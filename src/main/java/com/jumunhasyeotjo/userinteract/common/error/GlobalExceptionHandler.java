@@ -1,6 +1,6 @@
 package com.jumunhasyeotjo.userinteract.common.error;
 
-import com.jumunhasyeotjo.userinteract.common.ApiRes;
+import com.library.passport.exception.PassportException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jumunhasyeotjo.userinteract.common.error.ErrorCode.INVALID_JSON;
-import static com.jumunhasyeotjo.userinteract.common.error.ErrorCode.VALIDATION_FAILED;
+import com.library.passport.entity.ApiRes;
+
+import static com.jumunhasyeotjo.userinteract.common.error.ErrorCode.*;
 
 @RestControllerAdvice
 @Slf4j
@@ -63,6 +64,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(errorCode.getStatus())
             .body(ApiRes.error(errorCode.getCode(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(PassportException.class)
+    public ResponseEntity<ApiRes<?>> handlePassportException(PassportException ex) {
+        log.error("PassportException: {}", ex.getMessage());
+        return ResponseEntity
+            .status(FORBIDDEN.getStatus())
+            .body(ApiRes.error(FORBIDDEN.getCode(), FORBIDDEN.getMessage()));
     }
 
     /**

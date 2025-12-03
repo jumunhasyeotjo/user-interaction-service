@@ -11,7 +11,7 @@ public record CompanyManagerDetailRes(
     String name,
     String slackId,
     String role,
-    UUID companyId,
+    String companyId,
     String status,
     LocalDateTime createdAt
 ) {
@@ -21,7 +21,7 @@ public record CompanyManagerDetailRes(
             user.name(),
             user.slackId(),
             user.role(),
-            user.companyId(),
+            user.companyId().toString(),
             user.status(),
             user.createdAt()
         );

@@ -133,6 +133,22 @@ public class UserRepositoryAdapter implements UserRepository {
         return result != null ? result : 0;
     }
 
+    @Override
+    public List<User> findCompanyDriversByHubId(UUID hubId) {
+        return queryFactory.selectFrom(user)
+            .join(user.driver, driver)
+            .where(driver.hubId.eq(hubId))
+            .fetch();
+    }
+
+    @Override
+    public List<User> findHubDrivers() {
+        return queryFactory.selectFrom(user)
+            .join(user.driver, driver)
+            .where(driver.hubId.isNull())
+            .fetch();
+    }
+
     public void delete(User user, Long requesterId) {
         user.markDeleted(requesterId);
     }
