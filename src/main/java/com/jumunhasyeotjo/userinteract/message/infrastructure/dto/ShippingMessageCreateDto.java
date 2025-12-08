@@ -1,10 +1,10 @@
-package com.jumunhasyeotjo.userinteract.message.presentation.dto.req;
+package com.jumunhasyeotjo.userinteract.message.infrastructure.dto;
 
 import com.jumunhasyeotjo.userinteract.message.application.command.ShippingMessageCreateCommand;
 
 import java.util.UUID;
 
-public record ShippingMessageCreateReq(
+public record ShippingMessageCreateDto(
     UUID originHubId,
     UUID receiverCompanyId,
     String orderIdMessage,

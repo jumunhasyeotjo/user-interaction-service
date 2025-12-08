@@ -1,12 +1,10 @@
 package com.jumunhasyeotjo.userinteract.message.application;
 
-import com.jumunhasyeotjo.userinteract.message.application.command.MessageCreateCommand;
 import com.jumunhasyeotjo.userinteract.message.application.command.ShippingMessageCreateCommand;
 import com.jumunhasyeotjo.userinteract.message.application.result.MessageResult;
+import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
 import com.jumunhasyeotjo.userinteract.message.application.service.UserClient;
 import com.jumunhasyeotjo.userinteract.message.domain.entity.Message;
-import com.jumunhasyeotjo.userinteract.message.domain.event.MessageCreatedEvent;
-import com.jumunhasyeotjo.userinteract.message.domain.event.BulkMessagesCreatedEvent;
 import com.jumunhasyeotjo.userinteract.message.domain.repository.MessageRepository;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.Content;
 import com.jumunhasyeotjo.userinteract.message.domain.vo.UserId;
@@ -29,19 +27,9 @@ public class MessageService {
     private final ApplicationEventPublisher publisher;
     private final MessageRepository messageRepository;
     private final UserClient userClient;
+    private final SlackClient slackClient;
 
     @Transactional
-    public void createMessage(MessageCreateCommand command) {
-        UserId userId = UserId.of(command.userId());
-        Content content = Content.of(command.content());
-        String slackId = userClient.getSlackId(userId.getUserId());
-
-        Message message = Message.create(userId, content);
-        messageRepository.save(message);
-
-        publisher.publishEvent(new MessageCreatedEvent(message, slackId));
-    }
-
     public void createShippingMessage(ShippingMessageCreateCommand command) {
         UUID hubId = command.originHubId();
         String orderIdMessage = command.orderIdMessage();
@@ -60,6 +48,8 @@ public class MessageService {
 
         List<HubManagerDto> hubManagers = userClient.getHubManagers(hubId);
 
+        System.out.println("허브 매니저 수 : " + hubManagers.size());
+
         List<Message> messages = new ArrayList<>();
         List<String> slackIds = new ArrayList<>();
         for (HubManagerDto hubManager : hubManagers) {
@@ -69,14 +59,9 @@ public class MessageService {
             messages.add(Message.create(userId, content));
             slackIds.add(slackId);
         }
-
-        saveAllAndPublishEvent(messages, slackIds, content);
-    }
-
-    @Transactional
-    public void saveAllAndPublishEvent(List<Message> messages, List<String> slackIds, Content content) {
         messageRepository.saveAll(messages);
-        publisher.publishEvent(new BulkMessagesCreatedEvent(messages, slackIds, content));
+
+        slackClient.sendMessage(slackIds, content.getContent());
     }
 
     private Content buildContent(
