@@ -105,7 +105,7 @@ jobs:
           JWT_KEY: ${{ secrets.JWT_KEY }}
           SLACK_API_KEY: ${{ secrets.SLACK_API_KEY}}
         run: |
-          cat > ${{ secrets.DEPLOY_DIR }}/.env << EOF
+          cat > $HOME/${{ secrets.DEPLOY_DIR }}/.env << EOF
           POSTGRES_HOST=${POSTGRES_HOST}
           POSTGRES_PORT=${POSTGRES_PORT}
           POSTGRES_DB=${POSTGRES_DB}
