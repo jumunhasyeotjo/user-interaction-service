@@ -75,9 +75,10 @@ jobs:
       - name: Deploy new version
         run: |
           JAR_PATH="build/libs/${{ secrets.JAR_NAME }}"
-          DEPLOY_DIR="${{ secrets.DEPLOY_DIR }}"
-          
-          mkdir -p $DEPLOY_DIR
+          DEPLOY_DIR="$HOME/${{ secrets.DEPLOY_DIR }}"
+          LOG_DIR="${{ secrets.LOG_DIR }}"
+          mkdir -p $HOME/$LOG_DIR
+          mkdir -p $HOME/$DEPLOY_DIR
           
           if [ -f "$DEPLOY_DIR/app.jar" ]; then
             mv "$DEPLOY_DIR/app.jar" "$DEPLOY_DIR/app.jar.bak.$(date +%Y%m%d_%H%M%S)"
@@ -104,7 +105,7 @@ jobs:
           JWT_KEY: ${{ secrets.JWT_KEY }}
           SLACK_API_KEY: ${{ secrets.SLACK_API_KEY}}
         run: |
-          cat > ${{ secrets.DEPLOY_DIR }}/.env << EOF
+          cat > $HOME/${{ secrets.DEPLOY_DIR }}/.env << EOF
           POSTGRES_HOST=${POSTGRES_HOST}
           POSTGRES_PORT=${POSTGRES_PORT}
           POSTGRES_DB=${POSTGRES_DB}
@@ -125,7 +126,7 @@ jobs:
 
       - name: Restart application
         run: |
-          $HOME/deploy/restart.sh --port ${{ secrets.APP_PORT }}
+          $HOME/deploy/restart.sh ${{ secrets.APP_PORT }} ${{ secrets.DEPLOY_DIR }} ${{ secrets.LOG_DIR }}
           
           echo "Waiting for application to start..."
           sleep 10
@@ -141,7 +142,7 @@ jobs:
           done
           
           echo "Application failed to start"
-          tail -100 ${{ secrets.LOG_DIR }}/app.log
+          tail -100 $HOME/${{ secrets.LOG_DIR }}/app.log
           exit 1
 
       - name: Verify deployment
@@ -152,6 +153,6 @@ jobs:
             echo "Deployment successful - Application is running on port ${{ secrets.APP_PORT }}"
           else
             echo "Deployment failed - Application is not running"
-            tail -50 ${{ secrets.LOG_DIR }}/app.log
+            tail -50 $HOME/${{ secrets.LOG_DIR }}/app.log
             exit 1
           fi
