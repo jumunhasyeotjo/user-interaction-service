@@ -76,8 +76,9 @@ jobs:
         run: |
           JAR_PATH="build/libs/${{ secrets.JAR_NAME }}"
           DEPLOY_DIR="${{ secrets.DEPLOY_DIR }}"
-          
-          mkdir -p $DEPLOY_DIR
+          LOG_DIR="${{ secrets.LOG_DIR }}"
+          mkdir -p $HOME/$LOG_DIR
+          mkdir -p $HOME/$DEPLOY_DIR
           
           if [ -f "$DEPLOY_DIR/app.jar" ]; then
             mv "$DEPLOY_DIR/app.jar" "$DEPLOY_DIR/app.jar.bak.$(date +%Y%m%d_%H%M%S)"
