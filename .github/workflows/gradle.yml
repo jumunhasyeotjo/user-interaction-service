@@ -125,7 +125,7 @@ jobs:
 
       - name: Restart application
         run: |
-          $HOME/deploy/restart.sh --port ${{ secrets.APP_PORT }}
+          $HOME/deploy/restart.sh ${{ secrets.APP_PORT }}
           
           echo "Waiting for application to start..."
           sleep 10
