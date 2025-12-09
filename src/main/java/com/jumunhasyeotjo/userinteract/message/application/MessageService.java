@@ -1,6 +1,7 @@
 package com.jumunhasyeotjo.userinteract.message.application;
 
-import com.jumunhasyeotjo.userinteract.message.application.command.ShippingMessageCreateCommand;
+import com.jumunhasyeotjo.userinteract.message.application.command.CreateShippingDelayedMessageCommand;
+import com.jumunhasyeotjo.userinteract.message.application.command.CreateShippingEtaMessageCommand;
 import com.jumunhasyeotjo.userinteract.message.application.result.MessageResult;
 import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
 import com.jumunhasyeotjo.userinteract.message.application.service.UserClient;
@@ -30,7 +31,30 @@ public class MessageService {
     private final SlackClient slackClient;
 
     @Transactional
-    public void createShippingMessage(ShippingMessageCreateCommand command) {
+    public void createShippingDelayedMessage(CreateShippingDelayedMessageCommand command) {
+        UUID companyId = command.companyId();
+        Content content = Content.of(command.message());
+
+        List<CompanyManagerDto> companyManagers = userClient.getCompanyManagers(companyId);
+
+        List<Message> messages = new ArrayList<>();
+        List<String> slackIds = new ArrayList<>();
+
+        for (CompanyManagerDto companyManager : companyManagers) {
+            UserId userId = UserId.of(companyManager.userId());
+            String slackId = companyManager.slackId();
+
+            messages.add(Message.create(userId, content));
+            slackIds.add(slackId);
+        }
+
+        messageRepository.saveAll(messages);
+
+        slackClient.sendMessage(slackIds, content.getContent());
+    }
+
+    @Transactional
+    public void createShippingMessage(CreateShippingEtaMessageCommand command) {
         UUID hubId = command.originHubId();
         String orderIdMessage = command.orderIdMessage();
         UUID companyId = command.receiverCompanyId();

@@ -1,10 +1,10 @@
-package com.jumunhasyeotjo.userinteract.message.infrastructure.dto;
+package com.jumunhasyeotjo.userinteract.message.infrastructure.event;
 
-import com.jumunhasyeotjo.userinteract.message.application.command.ShippingMessageCreateCommand;
+import com.jumunhasyeotjo.userinteract.message.application.command.CreateShippingEtaMessageCommand;
 
 import java.util.UUID;
 
-public record ShippingMessageCreateDto(
+public record ShippingEtaMessageEvent(
     UUID originHubId,
     UUID receiverCompanyId,
     String orderIdMessage,
@@ -12,8 +12,8 @@ public record ShippingMessageCreateDto(
     String etaMessage,
     Long driverId
 ) {
-    public ShippingMessageCreateCommand toCommand() {
-        return new ShippingMessageCreateCommand(
+    public CreateShippingEtaMessageCommand toCommand() {
+        return new CreateShippingEtaMessageCommand(
             this.originHubId,
             this.receiverCompanyId,
             this.orderIdMessage,
