@@ -11,6 +11,9 @@ import com.library.passport.annotation.PassportAuthorize;
 import com.library.passport.annotation.PassportUser;
 import com.library.passport.entity.ApiRes;
 import com.library.passport.proto.PassportProto.Passport;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,15 +24,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "passportHeader") // ⭐ 전체 컨트롤러에 Passport 인증 적용
 public class UserController {
+
     private final UserService userService;
 
     @PatchMapping("/approve")
     @PassportAuthorize
+    @Operation(summary = "유저 승인 처리", description = "유저 상태를 변경(승인/거절) 처리합니다.")
     public ResponseEntity<ApiRes<UserDetailRes>> approveUser(
-        @PassportUser Passport passport,
+        @Parameter(hidden = true) @PassportUser Passport passport,
         @RequestBody ApproveReq req
     ) {
+
         ApproveCommand command = new ApproveCommand(
             req.userId(),
             req.status()
@@ -42,81 +49,99 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PassportAuthorize(
-        checkResult = true
-    )
+    @PassportAuthorize(checkResult = true)
+    @Operation(summary = "유저 단건 조회", description = "userId로 특정 유저를 조회합니다.")
     public ResponseEntity<ApiRes<UserDetailRes>> getUser(
-        @PassportUser Passport passport,
+        @Parameter(hidden = true) @PassportUser Passport passport,
         @PathVariable Long userId
     ) {
-        UserResult userResult = userService.getUser(userId);
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userResult))
+            ApiRes.success(
+                UserDetailRes.from(
+                    userService.getUser(userId)
+                )
+            )
         );
     }
 
     @GetMapping("/name/{name}")
-    @PassportAuthorize(
-        checkResult = true
-    )
+    @PassportAuthorize(checkResult = true)
+    @Operation(summary = "유저 이름으로 조회", description = "이름 기준으로 유저 정보를 조회합니다.")
     public ResponseEntity<ApiRes<UserDetailRes>> getUserByName(
-        @PassportUser Passport passport,
+        @Parameter(hidden = true) @PassportUser Passport passport,
         @PathVariable String name
     ) {
-        UserResult userResult = userService.getUserByName(name);
-
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userResult))
+            ApiRes.success(
+                UserDetailRes.from(
+                    userService.getUserByName(name)
+                )
+            )
         );
     }
 
-    @GetMapping("/")
+    @GetMapping
     @PassportAuthorize
+    @Operation(summary = "유저 목록 조회", description = "전체 유저 목록을 페이지네이션하여 조회합니다.")
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsers(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable
+        @Parameter(hidden = true) @PassportUser Passport passport,
+        @PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable
     ) {
         return ResponseEntity.ok(
-            ApiRes.success(userService.getUsers(pageable).map(UserDetailRes::from))
+            ApiRes.success(
+                userService.getUsers(pageable)
+                    .map(UserDetailRes::from)
+            )
         );
     }
 
     @GetMapping("/status/{req}")
     @PassportAuthorize
+    @Operation(summary = "유저 상태 기준 조회", description = "상태(UserStatus)에 따라 유저 목록을 조회합니다.")
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByStatus(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
+        @Parameter(hidden = true) @PassportUser Passport passport,
+        @PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable,
         @PathVariable String req
     ) {
         UserStatus status = UserStatus.of(req);
         return ResponseEntity.ok(
-            ApiRes.success(userService.getUsersByStatus(pageable, status).map(UserDetailRes::from))
+            ApiRes.success(
+                userService.getUsersByStatus(pageable, status)
+                    .map(UserDetailRes::from)
+            )
         );
     }
 
     @GetMapping("/role/{req}")
     @PassportAuthorize
+    @Operation(summary = "유저 역할 기준 조회", description = "역할(UserRole)에 따라 유저 목록을 조회합니다.")
     public ResponseEntity<ApiRes<Page<UserDetailRes>>> getUsersByRole(
-        @PassportUser Passport passport,
-        @PageableDefault(page = 0, size = 10, sort = "createAt") Pageable pageable,
-        @RequestParam String req
+        @Parameter(hidden = true) @PassportUser Passport passport,
+        @PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable,
+        @PathVariable String req
     ) {
         UserRole role = UserRole.of(req);
         return ResponseEntity.ok(
-            ApiRes.success(userService.getUsersByRole(pageable, role).map(UserDetailRes::from))
+            ApiRes.success(
+                userService.getUsersByRole(pageable, role)
+                    .map(UserDetailRes::from)
+            )
         );
     }
 
     @DeleteMapping("/{userId}")
-    @PassportAuthorize(
-        checkResult = true
-    )
+    @PassportAuthorize(checkResult = true)
+    @Operation(summary = "유저 삭제", description = "userId 기준으로 유저를 삭제합니다.")
     public ResponseEntity<ApiRes<UserDetailRes>> deleteUser(
-        @PassportUser Passport passport,
+        @Parameter(hidden = true) @PassportUser Passport passport,
         @PathVariable Long userId
     ) {
         return ResponseEntity.ok(
-            ApiRes.success(UserDetailRes.from(userService.deleteUser(userId, passport.getUserId())))
+            ApiRes.success(
+                UserDetailRes.from(
+                    userService.deleteUser(userId, passport.getUserId())
+                )
+            )
         );
     }
 }

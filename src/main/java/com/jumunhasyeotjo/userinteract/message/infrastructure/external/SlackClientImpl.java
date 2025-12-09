@@ -4,6 +4,7 @@ import com.jumunhasyeotjo.userinteract.common.error.ErrorCode;
 import com.jumunhasyeotjo.userinteract.message.application.service.SlackClient;
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class SlackClientImpl implements SlackClient {
     private final Slack slack = Slack.getInstance();
 
     @Override
+    @Retry(name = "slackRetry", fallbackMethod = "slackFallback")
     public void sendMessage(List<String> userIds, String message) {
         String channelId = openChannel(userIds);
         sendMessageToChannel(channelId, message);
@@ -59,5 +61,9 @@ public class SlackClientImpl implements SlackClient {
             log.error("Slack API error during chat.postMessage", e);
             throw new RuntimeException(ErrorCode.SEND_MESSAGE_FAILED.getMessage());
         }
+    }
+
+    private void slackFallback(List<String> userIds, String message, Throwable t) {
+        log.error("Slack send failed after retries. userIds={}, error={}", userIds, t.getMessage());
     }
 }
