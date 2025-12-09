@@ -29,7 +29,9 @@ public class HubCompanyService implements HubCompanyClient {
     @CircuitBreaker(name = "companyService")
     @Retry(name = "companyService", fallbackMethod = "existCompanyFallback")
     public Boolean existCompany(UUID companyId) {
-        return hubCompanyFeignClient.existCompany(companyId).data().get("exist");
+        Boolean res = hubCompanyFeignClient.existCompany(companyId).data();
+        System.out.println(res);
+        return hubCompanyFeignClient.existCompany(companyId).data();
     }
 
     public Boolean existHubFallback(UUID hubId, Throwable e) {
