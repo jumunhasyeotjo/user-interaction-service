@@ -1,17 +1,21 @@
 package com.jumunhasyeotjo.userinteract.auth.infrastructure.external;
 
+import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.CompanyExistRes;
+import com.jumunhasyeotjo.userinteract.auth.infrastructure.dto.HubExistRes;
+import com.library.passport.entity.ApiRes;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Map;
 import java.util.UUID;
 
 @FeignClient(name = "hub-product-stock-company")
 public interface HubCompanyFeignClient {
 
     @GetMapping("/internal/api/v1/hubs/{hubId}/exists")
-    Object existHub(@PathVariable("hubId") UUID hubId);
+    HubExistRes existHub(@PathVariable("hubId") UUID hubId);
 
     @GetMapping("/internal/api/v1/companies/{companyId}/exists")
-    Object existCompany(@PathVariable("companyId") UUID companyId);
+    CompanyExistRes existCompany(@PathVariable("companyId") UUID companyId);
 }
