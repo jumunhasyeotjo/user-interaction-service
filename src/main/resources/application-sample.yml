@@ -20,12 +20,17 @@ spring:
       port: ${REDIS_PORT}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+    defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
     show-sql: true
+  sql:
+    init:
+      mode: always
+
 
   kafka:
     bootstrap-servers: ${KAFKA_SERVER}
