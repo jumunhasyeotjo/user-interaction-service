@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/v1/auth")
 @Tag(name = "Auth API", description = "인증 관련 API(회원가입, 로그인, 토큰 재발급, 로그아웃)")
 public class AuthController {
 

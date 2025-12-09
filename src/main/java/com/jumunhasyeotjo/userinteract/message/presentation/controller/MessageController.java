@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/messages")
+@RequestMapping("/api/v1/messages")
 @Tag(name = "Message API", description = "메시지 조회 API")
 public class MessageController {
 

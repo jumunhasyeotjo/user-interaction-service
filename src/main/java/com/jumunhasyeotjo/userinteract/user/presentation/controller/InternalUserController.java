@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/internal/v1/users")
+@RequestMapping("/internal/api/v1/users")
 @RequiredArgsConstructor
 public class InternalUserController {
 

@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "passportHeader") // ⭐ 전체 컨트롤러에 Passport 인증 적용
 public class UserController {
