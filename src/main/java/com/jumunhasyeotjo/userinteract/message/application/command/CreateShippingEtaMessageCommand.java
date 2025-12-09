@@ -2,7 +2,7 @@ package com.jumunhasyeotjo.userinteract.message.application.command;
 
 import java.util.UUID;
 
-public record ShippingMessageCreateCommand(
+public record CreateShippingEtaMessageCommand(
     UUID originHubId,
     UUID receiverCompanyId,
     String orderIdMessage,
