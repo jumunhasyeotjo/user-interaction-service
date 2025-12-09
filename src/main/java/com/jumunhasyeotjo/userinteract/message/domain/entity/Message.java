@@ -28,7 +28,7 @@ public class Message {
     private UserId userId;
 
     @Embedded
-    @AttributeOverride(name = "content", column = @Column(name = "content"))
+    @AttributeOverride(name = "content", column = @Column(name = "content", length = 1024))
     private Content content;
 
     @CreatedDate
