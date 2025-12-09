@@ -19,15 +19,15 @@ public class HubCompanyService implements HubCompanyClient {
     private final ObjectMapper objectMapper;
 
     @Override
-    @CircuitBreaker(name = "hubService", fallbackMethod = "existHubFallback")
-    @Retry(name = "hubService")
+    @CircuitBreaker(name = "hubService")
+    @Retry(name = "hubService", fallbackMethod = "existHubFallback")
     public Boolean existHub(UUID hubId) {
         return hubCompanyFeignClient.existHub(hubId).data().get("exist");
     }
 
 
-    @CircuitBreaker(name = "companyService", fallbackMethod = "existCompanyFallback")
-    @Retry(name = "companyService")
+    @CircuitBreaker(name = "companyService")
+    @Retry(name = "companyService", fallbackMethod = "existCompanyFallback")
     public Boolean existCompany(UUID companyId) {
         return hubCompanyFeignClient.existCompany(companyId).data().get("exist");
     }
