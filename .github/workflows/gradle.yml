@@ -45,9 +45,9 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          PASSPORT_ALGO: ${{ secrets.PASSPORT_ALGORITHM }}
-          PASSPORT_EXPIRATION: ${{ secrets.PASSPORT_EXP }}
-          PASSPORT_SECRET: ${{ secrets.PASSPORT_KEY }}
+          PASSPORT_ALGORITHM: ${{ secrets.PASSPORT_ALGORITHM }}
+          PASSPORT_EXP: ${{ secrets.PASSPORT_EXP }}
+          PASSPORT_KEY: ${{ secrets.PASSPORT_KEY }}
           KAFKA_SERVER: ${{ secrets.KAFKA_SERVER }}
           GROUP_ID: ${{ secrets.GROUP_ID }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
@@ -96,9 +96,9 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          PASSPORT_ALGO: ${{ secrets.PASSPORT_ALGORITHM }}
-          PASSPORT_EXPIRATION: ${{ secrets.PASSPORT_EXP }}
-          PASSPORT_SECRET: ${{ secrets.PASSPORT_KEY }}
+          PASSPORT_ALGORITHM: ${{ secrets.PASSPORT_ALGORITHM }}
+          PASSPORT_EXP: ${{ secrets.PASSPORT_EXP }}
+          PASSPORT_KEY: ${{ secrets.PASSPORT_KEY }}
           KAFKA_SERVER: ${{ secrets.KAFKA_SERVER }}
           GROUP_ID: ${{ secrets.GROUP_ID }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
@@ -113,9 +113,9 @@ jobs:
           POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
           REDIS_HOST=${REDIS_HOST}
           REDIS_PORT=${REDIS_PORT}
-          PASSPORT_ALGO=${PASSPORT_ALGORITHM}
-          PASSPORT_EXPIRATION=${PASSPORT_EXP}
-          PASSPORT_SECRET=${PASSPORT_KEY}
+          PASSPORT_ALGORITHM=${PASSPORT_ALGORITHM}
+          PASSPORT_EXP=${PASSPORT_EXP}
+          PASSPORT_KEY=${PASSPORT_KEY}
           KAFKA_SERVER=${KAFKA_SERVER}
           GROUP_ID=${GROUP_ID}
           EUREKA_SERVER=${EUREKA_SERVER}
