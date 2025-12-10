@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "passportHeader") // ⭐ 전체 컨트롤러에 Passport 인증 적용
+@SecurityRequirement(name = "passportHeader")
 public class UserController {
 
     private final UserService userService;
