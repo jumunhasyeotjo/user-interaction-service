@@ -1,5 +1,7 @@
 server:
   port: 8085
+  servlet:
+    context-path: /user
 
 spring:
   config:
@@ -13,6 +15,8 @@ spring:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 3
 
   data:
     redis:
@@ -20,7 +24,7 @@ spring:
       port: ${REDIS_PORT}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
@@ -148,3 +152,7 @@ management:
     web:
       exposure:
         include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
