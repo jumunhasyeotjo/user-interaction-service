@@ -53,6 +53,11 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
 
 service:
   jwt:
