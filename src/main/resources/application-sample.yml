@@ -53,10 +53,10 @@ eureka:
       defaultZone: ${EUREKA_SERVER}
     register-with-eureka: true
     fetch-registry: true
+    registry-fetch-interval-seconds: 10
   instance:
-    prefer-ip-address: false
-    hostname: user-service
-    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+    ip-address: ${ECS_INSTANCE_IP_ADDRESS}
 
 service:
   jwt:
