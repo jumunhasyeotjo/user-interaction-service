@@ -55,6 +55,7 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: false
+    hostname: user-service
     instance-id: ${spring.application.name}:${server.port}
 
 service:
