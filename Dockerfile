@@ -7,6 +7,6 @@ COPY script/entrypoint.sh /script/entrypoint.sh
 RUN chmod +x /script/entrypoint.sh
 
 # JAR 복사
-COPY ${JAR_FILE} /app.jar
+COPY build/libs/*.jar /app.jar
 
 ENTRYPOINT ["/script/entrypoint.sh"]
