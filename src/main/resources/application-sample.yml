@@ -156,7 +156,21 @@ management:
     web:
       exposure:
         include: "*"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true # P95, P99 등 히스토그램 데이터 수집
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_URL}:4318/v1/traces # 로컬 Docker의 Tempo로 전송
+  tracing:
+    sampling:
+      probability: 1.0 # 개발환경이므로 모든(100%) 트래픽 추적
   prometheus:
     metrics:
       export:
         enabled: true
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"
