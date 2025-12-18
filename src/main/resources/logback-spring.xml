@@ -31,38 +31,6 @@
         </encoder>
     </appender>
 
-    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <http>
-            <url>http://localhost:3100/loki/api/v1/push</url>
-        </http>
-
-        <batchTimeoutMs>1000</batchTimeoutMs>
-        <maxBatchSize>100</maxBatchSize>
-
-        <format>
-            <label>
-                <pattern>app=${SERVICE_NAME},host=${HOSTNAME},env=${ACTIVE_PROFILE},level=%level</pattern>
-            </label>
-
-            <message>
-                <pattern>
-                    {
-                    "timestamp": "%date{ISO8601}",
-                    "level": "%level",
-                    "logger": "%logger",
-                    "thread": "%thread",
-                    "service": "${SERVICE_NAME}",
-                    "env": "${ACTIVE_PROFILE}",
-                    "traceId": "%X{traceId:-}",
-                    "spanId": "%X{spanId:-}",
-                    "message": "%message",
-                    "exception": "%exception{5}"
-                    }
-                </pattern>
-            </message>
-        </format>
-    </appender>
-
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOKI"/>
