@@ -12,6 +12,7 @@ jobs:
     with:
       service-name: user
       java-version: '17'
+      github-username: ${{ github.actor }}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}  # ← 명시적 전달 필요
 

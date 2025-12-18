@@ -10,6 +10,9 @@ on:
         required: false
         type: string
         default: '17'
+      github-username:
+        required: true
+        type: string
     secrets:
       github-token:
         required: true
@@ -45,6 +48,9 @@ jobs:
           echo "application.yml created"
 
       - name: ./gradlew clean build -x test
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
         run: ./gradlew clean build -x test
 
       - name: 생성된 jar 'build/libs/app-jar' Upload ...
