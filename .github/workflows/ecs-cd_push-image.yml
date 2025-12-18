@@ -1,0 +1,79 @@
+name: ecs CI/CD _ Push image
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+      ecr-repository:
+        required: true
+        type: string
+      aws-region:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+      github-token:
+        required: true
+    outputs:
+      image-tag:
+        value: ${{ jobs.push-image.outputs.image-tag }}
+      image-uri:
+        value: ${{ jobs.push-image.outputs.image-uri }}
+jobs:
+  push-image:
+    name: Push Image
+    runs-on: ubuntu-latest
+    environment: user-aws
+    outputs:
+      image-tag: ${{ steps.image-info.outputs.image-tag }}
+      image-uri: ${{ steps.image-info.outputs.image-uri }}
+
+    steps:
+      - name: 코드 checkout
+        uses: actions/checkout@v4
+
+      - name: build/libs/app-jar 다운로드
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tag
+        id: image-info
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          IMAGE_TAG="prod-${SHORT_SHA}-${TIMESTAMP}"
+
+          echo "image-tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "image-uri=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.image-info.outputs.image-tag }}
+        run: |
+          docker build \
+            --build-arg JAR_FILE=build/libs/*.jar \
+            -t $ECR_REGISTRY/${{ inputs.ecr-repository }}:$IMAGE_TAG \
+            -t $ECR_REGISTRY/${{ inputs.ecr-repository }}:latest \
+            .
+          docker push $ECR_REGISTRY/${{ inputs.ecr-repository }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ inputs.ecr-repository }}:latest

@@ -1,0 +1,45 @@
+
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+env:
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ==========================================================================
+  # CI: Job 1: Test
+  # ==========================================================================
+jobs:
+  test:
+    name: CI:Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: 코드 checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: chmod +x gradlew
+        run: chmod +x gradlew
+
+      - name: cp application-sample.yml application.yml
+        run: |
+          cp src/main/resources/application-sample.yml src/main/resources/application.yml
+          echo "application.yml created from sample"
+
+      - name: /gradlew clean test -Dspring.profiles.active=test
+        run: ./gradlew clean test -Dspring.profiles.active=test
