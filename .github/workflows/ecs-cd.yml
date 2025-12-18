@@ -1,0 +1,44 @@
+name: ecs CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    name: SpringBoot build
+    uses: ./.github/workflows/ecs-cd_build.yml
+    with:
+      service-name: user
+      java-version: '17'
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}  # ← 명시적 전달 필요
+
+  push-image:
+    needs: build
+    name: ECR Docker
+    uses: ./.github/workflows/ecs-cd_push-image.yml
+    with:
+      service-name: user
+      ecr-repository: jumunhasyeo-dev-user
+      aws-region: ap-northeast-2
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}  # ← 명시적 전달 필요
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy:
+    needs: push-image
+    name: ECS Deploy
+    uses: ./.github/workflows/ecs-cd_deploy-ecs.yml
+    with:
+      service-name: hub
+      ecs-cluster: jumunhasyeo-dev-cluster
+      ecs-service: jumunhasyeo-dev-user
+      parameter-path: /jumunhasyeo/dev/user/
+      image-uri: ${{ needs.push-image.outputs.image-uri }}
+      aws-region: ap-northeast-2
+    secrets:
+      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

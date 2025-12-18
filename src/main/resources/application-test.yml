@@ -1,43 +1,39 @@
-server:
-  port: 8085
-
 spring:
   config:
-    import: optional:file:./.env[.properties]
-
-  application:
-    name: user-service
+    activate:
+      on-profile: test
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
     hikari:
       maximum-pool-size: 3
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: localhost
+      port: 6379
+
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop  # 테스트마다 스키마 재생성
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
-    show-sql: true
+    show-sql: false  # 테스트 로그 줄이기
+
   sql:
     init:
       mode: never
 
-
   kafka:
-    bootstrap-servers: ${KAFKA_SERVER}
+    bootstrap-servers: localhost:9092
     consumer:
-      group-id: user-interaction-service
+      group-id: user-interaction-service-test
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -45,46 +41,36 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-
-
 eureka:
   client:
+    enabled: false  # 테스트에서는 Eureka 비활성화
     service-url:
-      defaultZone: ${EUREKA_SERVER}
-    register-with-eureka: true
-    fetch-registry: true
-    registry-fetch-interval-seconds: 10
+      defaultZone: http://localhost:8761/eureka/
   instance:
-    prefer-ip-address: true
-    ip-address: ${ECS_INSTANCE_IP_ADDRESS}
+    prefer-ip-address: false
 
 service:
   jwt:
-    secret-key: ${JWT_KEY}
+    secret-key: test-jwt-secret-key-for-testing-purposes-must-be-long-enough
 
 slack:
   bot:
-    token: ${SLACK_API_KEY}
+    token: xoxb-test-slack-token-for-testing
 
 eas:
   passport:
-    secretKey: ${PASSPORT_KEY}
-    expiration: ${PASSPORT_EXP}
-    algorithm: ${PASSPORT_ALGORITHM}
+    secretKey: test-passport-secret-key-must-be-at-least-32-characters-long
+    expiration: 604800
+    algorithm: HS256
 
 springdoc:
   model-and-view-allowed: true
   default-support-form-data: true
   show-actuator: false
   swagger-ui:
-    enabled: true
-    try-it-out-enabled: true
-    path: /swagger-ui.html
+    enabled: false  # 테스트에서는 Swagger 비활성화
   api-docs:
-    resolve-schema-properties: true
-    path: /v3/api-docs
-  pageable-converter:
-    enabled: true
+    enabled: false
 
 resilience4j:
   circuitbreaker:
@@ -92,10 +78,10 @@ resilience4j:
       companyService:
         registerHealthIndicator: true
         slidingWindowType: COUNT_BASED
-        slidingWindowSize: 10       # 최근 10번 호출 기준
-        minimumNumberOfCalls: 5     # CB 평가 최소 호출 수
-        failureRateThreshold: 50    # 50% 이상 실패 시 open
-        waitDurationInOpenState: 10s # 오픈 후 half-open 대기 시간
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
 
@@ -155,22 +141,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
-  metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true # P95, P99 등 히스토그램 데이터 수집
-  otlp:
-    tracing:
-      endpoint: http://${MONITORING_URL}:4318/v1/traces # 로컬 Docker의 Tempo로 전송
-  tracing:
-    sampling:
-      probability: 1.0 # 개발환경이므로 모든(100%) 트래픽 추적
+        include: health, info
   prometheus:
     metrics:
       export:
-        enabled: true
+        enabled: false  # 테스트에서는 Prometheus 비활성화
 
 logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"
+  level:
+    org.hibernate.SQL: error
+    org.hibernate.type.descriptor.sql.BasicBinder: error
+    org.springframework.orm.jpa: error
+    org.springframework.transaction: error
+    com.slack.api: error
