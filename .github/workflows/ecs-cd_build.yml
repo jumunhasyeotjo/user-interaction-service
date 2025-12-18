@@ -1,0 +1,61 @@
+name: ecs CI/CD _ Build Job
+
+on:
+  workflow_call:  # 다른 워크플로우에서 호출 가능
+    inputs:
+      service-name:
+        required: true
+        type: string
+      java-version:
+        required: false
+        type: string
+        default: '17'
+      github-username:
+        required: true
+        type: string
+    secrets:
+      github-token:
+        required: true
+    outputs:
+      artifact-name:
+        description: "빌드된 JAR 아티팩트 이름"
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: app-jar
+
+    steps:
+      - name: 코드 checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: chmod +x ./gradlew
+        run: chmod +x ./gradlew
+
+      - name: cp application-sample.yml application.yml
+        run: |
+          cp src/main/resources/application-sample.yml src/main/resources/application.yml
+          echo "application.yml created"
+
+      - name: ./gradlew clean build -x test
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+        run: ./gradlew clean build -x test
+
+      - name: 생성된 jar 'build/libs/app-jar' Upload ...
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
+          retention-days: 1

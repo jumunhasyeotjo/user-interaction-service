@@ -1,0 +1,176 @@
+server:
+  port: 8085
+
+spring:
+  config:
+    import: optional:file:./.env[.properties]
+
+  application:
+    name: user-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      maximum-pool-size: 3
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  sql:
+    init:
+      mode: never
+
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVER}
+    consumer:
+      group-id: user-interaction-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER}
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: true
+    ip-address: ${ECS_INSTANCE_IP_ADDRESS}
+
+service:
+  jwt:
+    secret-key: ${JWT_KEY}
+
+slack:
+  bot:
+    token: ${SLACK_API_KEY}
+
+eas:
+  passport:
+    secretKey: ${PASSPORT_KEY}
+    expiration: ${PASSPORT_EXP}
+    algorithm: ${PASSPORT_ALGORITHM}
+
+springdoc:
+  model-and-view-allowed: true
+  default-support-form-data: true
+  show-actuator: false
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    resolve-schema-properties: true
+    path: /v3/api-docs
+  pageable-converter:
+    enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      companyService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10       # 최근 10번 호출 기준
+        minimumNumberOfCalls: 5     # CB 평가 최소 호출 수
+        failureRateThreshold: 50    # 50% 이상 실패 시 open
+        waitDurationInOpenState: 10s # 오픈 후 half-open 대기 시간
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      hubService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+  retry:
+    instances:
+      companyService:
+        maxAttempts: 3
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        retryExceptions:
+          - java.io.IOException
+          - org.springframework.web.client.RestClientException
+
+      hubService:
+        maxAttempts: 3
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        retryExceptions:
+          - java.io.IOException
+          - org.springframework.web.client.RestClientException
+
+      slackRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - java.io.IOException
+          - com.slack.api.methods.SlackApiException
+
+  bulkhead:
+    instances:
+      companyService:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 500ms
+      hubService:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 500ms
+
+  timeLimiter:
+    instances:
+      companyService:
+        timeoutDuration: 2s
+      hubService:
+        timeoutDuration: 2s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true # P95, P99 등 히스토그램 데이터 수집
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_URL}:4318/v1/traces # 로컬 Docker의 Tempo로 전송
+  tracing:
+    sampling:
+      probability: 1.0 # 개발환경이므로 모든(100%) 트래픽 추적
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"

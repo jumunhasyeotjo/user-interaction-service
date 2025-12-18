@@ -1,0 +1,156 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
+    hikari:
+      maximum-pool-size: 3
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트마다 스키마 재생성
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false  # 테스트 로그 줄이기
+
+  sql:
+    init:
+      mode: never
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: user-interaction-service-test
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+eureka:
+  client:
+    enabled: false  # 테스트에서는 Eureka 비활성화
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: false
+
+service:
+  jwt:
+    secret-key: test-jwt-secret-key-for-testing-purposes-must-be-long-enough
+
+slack:
+  bot:
+    token: xoxb-test-slack-token-for-testing
+
+eas:
+  passport:
+    secretKey: test-passport-secret-key-must-be-at-least-32-characters-long
+    expiration: 604800
+    algorithm: HS256
+
+springdoc:
+  model-and-view-allowed: true
+  default-support-form-data: true
+  show-actuator: false
+  swagger-ui:
+    enabled: false  # 테스트에서는 Swagger 비활성화
+  api-docs:
+    enabled: false
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      companyService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+      hubService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+
+  retry:
+    instances:
+      companyService:
+        maxAttempts: 3
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        retryExceptions:
+          - java.io.IOException
+          - org.springframework.web.client.RestClientException
+
+      hubService:
+        maxAttempts: 3
+        waitDuration: 200ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        retryExceptions:
+          - java.io.IOException
+          - org.springframework.web.client.RestClientException
+
+      slackRetry:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - java.io.IOException
+          - com.slack.api.methods.SlackApiException
+
+  bulkhead:
+    instances:
+      companyService:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 500ms
+      hubService:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 500ms
+
+  timeLimiter:
+    instances:
+      companyService:
+        timeoutDuration: 2s
+      hubService:
+        timeoutDuration: 2s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  prometheus:
+    metrics:
+      export:
+        enabled: false  # 테스트에서는 Prometheus 비활성화
+
+logging:
+  level:
+    org.hibernate.SQL: error
+    org.hibernate.type.descriptor.sql.BasicBinder: error
+    org.springframework.orm.jpa: error
+    org.springframework.transaction: error
+    com.slack.api: error
