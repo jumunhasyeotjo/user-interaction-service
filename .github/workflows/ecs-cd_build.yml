@@ -48,6 +48,9 @@ jobs:
           echo "application.yml created"
 
       - name: ./gradlew clean build -x test
+        env:
+          GITHUB_USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
         run: ./gradlew clean build -x test
 
       - name: 생성된 jar 'build/libs/app-jar' Upload ...
