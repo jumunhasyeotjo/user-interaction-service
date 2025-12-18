@@ -10,6 +10,9 @@ on:
         required: false
         type: string
         default: '17'
+      github-username:
+        required: true
+        type: string
     secrets:
       github-token:
         required: true
