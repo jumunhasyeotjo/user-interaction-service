@@ -34,7 +34,7 @@ jobs:
     name: ECS Deploy
     uses: ./.github/workflows/ecs-cd_deploy-ecs.yml
     with:
-      service-name: hub
+      service-name: user
       ecs-cluster: jumunhasyeo-dev-cluster
       ecs-service: jumunhasyeo-dev-user
       parameter-path: /jumunhasyeo/dev/user/
