@@ -1,0 +1,115 @@
+name: ecs CI/CD _ Deploy Ecs
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+      ecs-cluster:
+        required: true
+        type: string
+      ecs-service:
+        required: true
+        type: string
+      parameter-path:
+        required: true
+        type: string
+      image-uri:
+        required: true
+        type: string
+      aws-region:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: user-aws
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: pull 파라미터 스토어 값
+        run: |
+          aws ssm get-parameters-by-path \
+            --path "${{ inputs.parameter-path }}" \
+            --recursive \
+            --with-decryption \
+            --region ${{ inputs.aws-region }} \
+            --output json > parameters.json
+
+      - name: Download 테스크 정의
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ inputs.ecs-service }} \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: 테스크 정의 환경 변수 갱신
+        run: |
+          python3 << 'PYTHON_SCRIPT'
+          import json
+          import sys
+          
+          with open('task-definition.json', 'r') as f:
+              task_def = json.load(f)
+          
+          with open('parameters.json', 'r') as f:
+              params_data = json.load(f)
+          
+          env_vars = []
+          for param in params_data.get('Parameters', []):
+              key = param['Name'].split('/')[-1]
+              value = param['Value']
+              env_vars.append({"name": key, "value": value})
+          
+          container = None
+          for cont in task_def['containerDefinitions']:
+              if cont['name'] == '${{ inputs.service-name }}':
+                  container = cont
+                  break
+          
+          if container is None:
+              print(f"❌ Container not found!")
+              sys.exit(1)
+          
+          container['environment'] = env_vars
+          
+          for key in ['taskDefinitionArn', 'revision', 'status', 
+                      'requiresAttributes', 'compatibilities', 
+                      'registeredAt', 'registeredBy']:
+              task_def.pop(key, None)
+          
+          with open('task-definition-updated.json', 'w') as f:
+              json.dump(task_def, f, indent=2)
+          PYTHON_SCRIPT
+
+      - name: Upload 테스크 정의
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-updated.json
+          container-name: ${{ inputs.service-name }}
+          image: ${{ inputs.image-uri }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ inputs.ecs-service }}
+          cluster: ${{ inputs.ecs-cluster }}
+          wait-for-service-stability: true
+
+      - name: Verify
+        run: echo "✅ Deployed successfully!"
