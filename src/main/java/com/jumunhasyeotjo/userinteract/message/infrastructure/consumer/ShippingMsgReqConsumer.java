@@ -41,10 +41,9 @@ public class ShippingMsgReqConsumer {
     // 배송 생성
     private void handleShippingEtaMessage(String payload) {
         try {
-            log.info("Send Slack ShippingEtaMessage");
-//            ShippingEtaMessageEvent event = objectMapper.readValue(payload, ShippingEtaMessageEvent.class);
-//            CreateShippingEtaMessageCommand command = event.toCommand();
-//            messageService.createShippingMessage(command);
+            ShippingEtaMessageEvent event = objectMapper.readValue(payload, ShippingEtaMessageEvent.class);
+            CreateShippingEtaMessageCommand command = event.toCommand();
+            messageService.createShippingMessage(command);
         } catch (Exception e) {
             log.error("Failed to consume shipping message. payload={}", payload, e);
         }
@@ -53,10 +52,9 @@ public class ShippingMsgReqConsumer {
     // 배송 지연
     private void handleShippingDelayedMessage(String payload) {
         try {
-            log.info("Send Slack ShippingDelayedMessage");
-//            ShippingDelayedMessageEvent event = objectMapper.readValue(payload, ShippingDelayedMessageEvent.class);
-//            CreateShippingDelayedMessageCommand command = event.toCommand();
-//            messageService.createShippingDelayedMessage(command);
+            ShippingDelayedMessageEvent event = objectMapper.readValue(payload, ShippingDelayedMessageEvent.class);
+            CreateShippingDelayedMessageCommand command = event.toCommand();
+            messageService.createShippingDelayedMessage(command);
         } catch (Exception e) {
             log.error("Failed to consume shipping message. payload={}", payload, e);
         }
